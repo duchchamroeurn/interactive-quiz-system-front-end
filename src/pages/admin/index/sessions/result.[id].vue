@@ -3,7 +3,6 @@
     <v-row>
       <v-col>
         <v-card>
-          <v-card-title>Session Results</v-card-title>
           <v-card-text v-if="results && results.length > 0">
             <v-data-table
               :headers="headers"
@@ -178,3 +177,11 @@
     );
   };
 </script>
+<route lang="json">
+  {
+    "meta": {
+      "title": "Sessions Results",
+      "requiresAuth": true
+    }
+  }
+</route>

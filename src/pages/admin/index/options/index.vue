@@ -299,3 +299,11 @@
     }, 500);
   };
 </script>
+<route lang="json">
+  {
+    "meta": {
+      "title": "Options",
+      "requiresAuth": true
+    }
+  }
+</route>

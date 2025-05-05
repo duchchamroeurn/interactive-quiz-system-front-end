@@ -365,3 +365,11 @@
     route.push('/admin/sessions/result/' + session.sessionId);
   };
 </script>
+<route lang="json">
+  {
+    "meta": {
+      "title": "Sessions",
+      "requiresAuth": true
+    }
+  }
+  </route>

@@ -348,3 +348,11 @@
     }, 500);
   };
 </script>
+<route lang="json">
+  {
+    "meta": {
+      "title": "Users",
+      "requiresAuth": true
+    }
+  }
+  </route>

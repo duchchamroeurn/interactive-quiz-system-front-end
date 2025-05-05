@@ -13,6 +13,8 @@ const router = createRouter({
   routes,
 })
 
+const appName: string = import.meta.env.VITE_APP_NAME
+
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
@@ -27,6 +29,13 @@ router.onError((err, to) => {
     console.error(err)
   }
 })
+
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title + ' | ' + appName
+  console.log(from)
+
+  next();
+});
 
 router.isReady().then(() => {
   localStorage.removeItem('vuetify:dynamic-reload')

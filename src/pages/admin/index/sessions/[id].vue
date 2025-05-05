@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-card>
-      <v-card-title>Session Details</v-card-title>
+      <v-card-title>Session</v-card-title>
       <div v-if="session">
         <v-card-subtitle>
           <v-container>
@@ -29,7 +29,7 @@
         <v-card-text>
           <v-card variant="text">
             <v-card-title>
-              Quiz Details
+              Quiz
             </v-card-title>
             <v-card-subtitle>
               <v-container>
@@ -166,3 +166,11 @@
     );
   };
 </script>
+<route lang="json">
+  {
+    "meta": {
+      "title": "Sessions Details",
+      "requiresAuth": true
+    }
+  }
+  </route>

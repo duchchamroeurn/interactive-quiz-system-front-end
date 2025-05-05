@@ -86,7 +86,14 @@
     }
   };
 </script>
-
+<route lang="json">
+  {
+    "meta": {
+      "title": "Login",
+      "requiresAuth": false
+    }
+  }
+  </route>
 <style scoped>
 .login-page {
   display: flex;

@@ -50,6 +50,13 @@
     route.push('/auth/login');
   };
 </script>
+<route lang="json">
+{
+  "meta": {
+    "title": "Welcome to"
+  }
+}
+</route>
 
 <style scoped>
 

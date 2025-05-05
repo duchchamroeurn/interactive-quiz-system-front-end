@@ -289,3 +289,11 @@
     route.push('/admin/quizzes/' + quiz.id);
   };
 </script>
+<route lang="json">
+  {
+    "meta": {
+      "title": "Quizzes",
+      "requiresAuth": true
+    }
+  }
+  </route>

@@ -66,8 +66,8 @@
   </v-container>
 </template>
 
-<script lang="ts">
-  import { defineComponent, onMounted, ref } from 'vue';
+<script lang="ts" setup>
+  import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
 
   interface Activity {
@@ -77,85 +77,77 @@
     time: string;
   }
 
-  export default defineComponent({
-    name: 'DashboardPage',
-    components: {
-    },
-    setup () {
-      const router = useRouter();
+  const router = useRouter();
 
-      // Mock data for key metrics
-      const totalUsers = ref(125);
-      const activeSessions = ref(15);
-      const totalQuizzes = ref(30);
-      const totalQuestions = ref(150);
-      const totalResults = ref(1200);
-      const overviewData = ref([
-        { title: 'Total Users', value: totalUsers },
-        { title: 'Active Sessions', value: activeSessions },
-        { title: 'Total Quizzes', value: totalQuizzes },
-        { title: 'Total Questions', value: totalQuestions },
-        { title: 'Total Results', value: totalResults },
-      ]);
+  // Mock data for key metrics
+  const totalUsers = ref(125);
+  const activeSessions = ref(15);
+  const totalQuizzes = ref(30);
+  const totalQuestions = ref(150);
+  const totalResults = ref(1200);
+  const overviewData = ref([
+    { title: 'Total Users', value: totalUsers },
+    { title: 'Active Sessions', value: activeSessions },
+    { title: 'Total Quizzes', value: totalQuizzes },
+    { title: 'Total Questions', value: totalQuestions },
+    { title: 'Total Results', value: totalResults },
+  ]);
 
 
-      // Mock data for recent activity
-      const recentActivities = ref<Activity[]>([
-        { id: '1', type: 'User', details: 'John Doe registered', time: '2 mins ago' },
-        { id: '2', type: 'Quiz', details: 'Quiz "Math 101" created', time: '10 mins ago' },
-        { id: '3', type: 'Session', details: 'Session "History Quiz" started', time: '30 mins ago' },
-        { id: '4', type: 'Question', details: 'Question "What is the capital of France?" created', time: '1 hour ago' },
-        { id: '5', type: 'Result', details: '10 new results submitted', time: '2 hours ago' },
-      ]);
+  // Mock data for recent activity
+  const recentActivities = ref<Activity[]>([
+    { id: '1', type: 'User', details: 'John Doe registered', time: '2 mins ago' },
+    { id: '2', type: 'Quiz', details: 'Quiz "Math 101" created', time: '10 mins ago' },
+    { id: '3', type: 'Session', details: 'Session "History Quiz" started', time: '30 mins ago' },
+    { id: '4', type: 'Question', details: 'Question "What is the capital of France?" created', time: '1 hour ago' },
+    { id: '5', type: 'Result', details: '10 new results submitted', time: '2 hours ago' },
+  ]);
 
-      // Function to simulate navigation
-      const createQuiz = () => {
-        router.push('admin/quizzes');
-      };
+  // Function to simulate navigation
+  const createQuiz = () => {
+    router.push('admin/quizzes');
+  };
 
-      const startSession = () => {
-        router.push('admin/sessions');
-      };
+  const startSession = () => {
+    router.push('admin/sessions');
+  };
 
-      const manageUsers = () => {
-        router.push('admin/users');
-      };
+  const manageUsers = () => {
+    router.push('admin/users');
+  };
 
-      const viewResults = () => {
-        router.push('/admin/sessions/result/19309a83-fdb2-48eb-a934-df23542c80d8');
-      };
+  const viewResults = () => {
+    router.push('/admin/sessions/result/19309a83-fdb2-48eb-a934-df23542c80d8');
+  };
 
-      const quickActions = ref([
-        { text: 'Create New Quiz', icon: 'mdi-plus-circle', color: 'primary', handler: createQuiz },
-        { text: 'Start a New Session', icon: 'mdi-play-circle', color: 'success', handler: startSession },
-        { text: 'Manage Users', icon: 'mdi-account-multiple', color: 'info', handler: manageUsers },
-        { text: 'View Recent Results', icon: 'mdi-chart-bar', color: 'warning', handler: viewResults },
-      ]);
+  const quickActions = ref([
+    { text: 'Create New Quiz', icon: 'mdi-plus-circle', color: 'primary', handler: createQuiz },
+    { text: 'Start a New Session', icon: 'mdi-play-circle', color: 'success', handler: startSession },
+    { text: 'Manage Users', icon: 'mdi-account-multiple', color: 'info', handler: manageUsers },
+    { text: 'View Recent Results', icon: 'mdi-chart-bar', color: 'warning', handler: viewResults },
+  ]);
 
-      onMounted(() => {
-      // In a real application, you would fetch this data from your backend
-      // Example:
-      // fetch('/api/dashboard')
-      //   .then(response => response.json())
-      //   .then(data => {
-      //     totalUsers.value = data.totalUsers;
-      //     activeSessions.value = data.activeSessions;
-      //     ...
-      //   });
-      });
-
-      return {
-        quickActions,
-        overviewData,
-        recentActivities,
-        createQuiz,
-        startSession,
-        manageUsers,
-        viewResults,
-      };
-    },
+  onMounted(() => {
+    // In a real application, you would fetch this data from your backend
+    // Example:
+    // fetch('/api/dashboard')
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     totalUsers.value = data.totalUsers;
+    //     activeSessions.value = data.activeSessions;
+    //     ...
+    //   });
   });
+
 </script>
+<route lang="json">
+  {
+    "meta": {
+      "title": "Dashboard",
+      "requiresAuth": true
+    }
+  }
+  </route>
 
 <style scoped>
 

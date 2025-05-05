@@ -3,7 +3,7 @@
     <v-row>
       <v-col>
         <v-card flat>
-          <v-card-title>Quiz Details</v-card-title>
+          <v-card-title>Quiz</v-card-title>
           <v-card-text>
             <v-card variant="text">
               <v-card-text>
@@ -143,3 +143,11 @@
     );
   };
 </script>
+<route lang="json">
+  {
+    "meta": {
+      "title": "Quiz Details",
+      "requiresAuth": true
+    }
+  }
+</route>

@@ -91,3 +91,11 @@
     }, 500);
   });
 </script>
+<route lang="json">
+  {
+    "meta": {
+      "title": "Question Details",
+      "requiresAuth": true
+    }
+  }
+</route>
