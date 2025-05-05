@@ -40,7 +40,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar class="elevation-2">
+    <v-app-bar class="elevation-1">
       <!-- <v-app-bar-nav-icon @click="drawer = !drawer" /> -->
 
       <v-app-bar-title>{{ getPageTitle }}</v-app-bar-title>
@@ -51,58 +51,37 @@
   </v-app>
 </template>
 
-<script lang="ts">
-  import { computed, defineComponent, ref } from 'vue';
+<script lang="ts" setup>
+  import { computed } from 'vue';
   import { useRoute } from 'vue-router';
+  const items = [
+    { text: 'Dashboard', icon: 'mdi-view-dashboard', path: '/admin' },
+    { text: 'Users', icon: 'mdi-account-multiple', path: '/admin/users' },
+    { text: 'Sessions', icon: 'mdi-clock', path: '/admin/sessions' },
+    { text: 'Quizzes', icon: 'mdi-clipboard-check', path: '/admin/quizzes' },
+    { text: 'Questions', icon: 'mdi-help-circle', path: '/admin/questions' },
+    { text: 'Options', icon: 'mdi-form-select', path: '/admin/options' },
+  ];
 
-  export default defineComponent({
-    name: 'AdminDashboard',
-    components: {
+  const route = useRoute();
+  const getPageTitle = computed(() => {
 
-    },
-    setup () {
-      const isSidebarOpen = ref(true);
-      const route = useRoute();
-      // const drawer = ref(false);
-      const toggleSidebar = () => {
-        isSidebarOpen.value = !isSidebarOpen.value;
-      };
-      const items = [
-        { text: 'Dashboard', icon: 'mdi-view-dashboard', path: '/admin' },
-        { text: 'Users', icon: 'mdi-account-multiple', path: '/admin/users' },
-        { text: 'Sessions', icon: 'mdi-clock', path: '/admin/sessions' },
-        { text: 'Quizzes', icon: 'mdi-clipboard-check', path: '/admin/quizzes' },
-        { text: 'Questions', icon: 'mdi-help-circle', path: '/admin/questions' },
-        { text: 'Options', icon: 'mdi-form-select', path: '/admin/options' },
-      ];
-
-      const getPageTitle = computed(() => {
-        const path = route.path;
-        switch (path) {
-          case '/admin':
-            return 'Dashboard';
-          case '/admin/users':
-            return 'Users';
-          case '/admin/sessions':
-            return 'Sessions';
-          case '/admin/quizzes':
-            return 'Quizzes';
-          case '/admin/questions':
-            return 'Questions';
-          case '/admin/options':
-            return 'Options';
-          default:
-            return route.meta.title;
-        }
-      });
-
-      return {
-        isSidebarOpen,
-        toggleSidebar,
-        getPageTitle,
-        // drawer,
-        items,
-      };
-    },
+    const path = route.path;
+    switch (path) {
+      case '/admin':
+        return 'Dashboard';
+      case '/admin/users':
+        return 'Users';
+      case '/admin/sessions':
+        return 'Sessions';
+      case '/admin/quizzes':
+        return 'Quizzes';
+      case '/admin/questions':
+        return 'Questions';
+      case '/admin/options':
+        return 'Options';
+      default:
+        return route.meta.title;
+    }
   });
 </script>

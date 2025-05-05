@@ -41,24 +41,14 @@
   </v-main>
 </template>
 
-<script lang="ts">
-  import { defineComponent } from 'vue';
+<script lang="ts" setup>
   import { useRouter } from 'vue-router';
 
-  export default defineComponent({
-    name: 'WelcomePage',
-    setup () {
-      const router = useRouter();
+  const route = useRouter()
 
-      const goToQuizList = () => {
-        router.push('/auth/login');
-      };
-
-      return {
-        goToQuizList,
-      };
-    },
-  });
+  const goToQuizList = () => {
+    route.push('/auth/login');
+  };
 </script>
 
 <style scoped>

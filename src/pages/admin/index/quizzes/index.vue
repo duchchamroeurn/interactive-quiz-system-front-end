@@ -128,198 +128,164 @@
 
   </v-container></template>
 
-<script lang="ts">
-  import { defineComponent, onMounted, ref } from 'vue';
+<script lang="ts" setup>
+  import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import type { VForm } from 'vuetify/components';
+  import type { Quiz } from '@/models/quiz';
 
-  interface Quiz {
-    id: string;
-    title: string;
-    createdAt: string;
-  }
-
-  export default defineComponent({
-    name: 'QuizListPage',
-    components: {
-
-    },
-    setup () {
-      const headers = [
-        { title: 'Quiz ID', value: 'id', width: '35%' },
-        { title: 'Title', value: 'title', width: '35%' },
-        { title: 'Created At', value: 'createdAt', width: '15%' },
-        { title: 'Actions', value: 'actions', sortable: false, width: '15%' },
-      ];
-      const route = useRouter();
-      const quizzes = ref<Quiz[]>([]);
-      const loading = ref(true);
-      const deleteDialog = ref({
-        show: false,
-        quiz: null as Quiz | null,
-        loading: false,
-      });
-
-      const editDialog = ref({
-        show: false,
-        quiz: {} as Quiz,
-        loading: false,
-      });
-      const editFormValid = ref(false);
-      const editForm = ref<VForm | null>(null);
-      const editMode = ref<'create' | 'edit'>('edit');
-
-      const titleRules = [
-        (v: string) => !!v || 'Title is required',
-        (v: string) => v.length >= 3 || 'Title must be at least 3 characters',
-      ];
-
-      onMounted(() => {
-        const mockResponse = {
-          success: true,
-          data: [
-            {
-              id: '15f8db0f-84f7-4cc4-9bbd-2701cce57006',
-              title: 'History Quiz 101',
-              createdAt: '2025-04-30T16:01:46.355996',
-            },
-          ],
-          page: 0,
-          size: 10,
-          totalElements: 1,
-          totalPages: 1,
-          timestamp: '2025-05-03T21:36:25.173631',
-        };
-
-        setTimeout(() => {
-          if (mockResponse.success) {
-            quizzes.value = mockResponse.data as Quiz[];
-          } else {
-            console.error('Failed to fetch quizzes:', mockResponse);
-          }
-          loading.value = false;
-        }, 500);
-      });
-
-      const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString(
-          undefined,
-          {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          }
-        );
-      };
-
-      const openDeleteDialog = (quiz: Quiz) => {
-        deleteDialog.value = {
-          show: true,
-          quiz,
-          loading: false,
-        };
-      };
-
-      const closeDeleteDialog = () => {
-        deleteDialog.value.show = false;
-        deleteDialog.value.quiz = null;
-      };
-
-      const confirmDeleteQuiz = () => {
-        if (!deleteDialog.value.quiz) return;
-
-        deleteDialog.value.loading = true;
-        // Simulate delete API call
-        setTimeout(() => {
-          // In a real application, you would call your delete API here
-          console.log('Deleting quiz:', deleteDialog.value.quiz);
-          // Remove the quiz from the list
-          quizzes.value = quizzes.value.filter(q => q.id !== deleteDialog.value.quiz!.id);
-          deleteDialog.value.loading = false;
-          closeDeleteDialog();
-        }, 500);
-      };
-
-      const openEditDialog = (quiz: Quiz) => {
-        editMode.value = 'edit';
-        editDialog.value = {
-          show: true,
-          quiz: { ...quiz },
-          loading: false,
-        };
-      };
-
-      const openCreateDialog = () => {
-        editMode.value = 'create';
-        editDialog.value = {
-          show: true,
-          quiz: {
-            id: '',
-            title: '',
-            createdAt: '',
-          },
-          loading: false,
-        };
-      };
-
-      const closeEditDialog = () => {
-        editDialog.value.show = false;
-        editDialog.value.quiz = {} as Quiz;
-      };
-
-      const saveEditQuiz = () => {
-        if (!editForm.value?.validate()) return;
-
-        editDialog.value.loading = true;
-        // Simulate save API call
-        setTimeout(() => {
-          // In a real application, you would call your update API here
-          console.log('Saving quiz:', editDialog.value.quiz);
-          if (editMode.value === 'edit') {
-            quizzes.value = quizzes.value.map(q =>
-              q.id === editDialog.value.quiz.id ? { ...editDialog.value.quiz } : q
-            );
-          } else {
-            const newQuiz = {
-              ...editDialog.value.quiz,
-              id: crypto.randomUUID(),
-              createdAt: new Date().toISOString(),
-            };
-            quizzes.value.push(newQuiz);
-          }
-
-          editDialog.value.loading = false;
-          closeEditDialog();
-        }, 500);
-      };
-
-      const viewQuizDetail = (quiz: Quiz) => {
-        route.push('/admin/quizzes/' + quiz.id);
-      };
-
-      return {
-        headers,
-        quizzes,
-        loading,
-        formatDate,
-        openDeleteDialog,
-        closeDeleteDialog,
-        confirmDeleteQuiz,
-        deleteDialog,
-        editDialog,
-        openEditDialog,
-        closeEditDialog,
-        saveEditQuiz,
-        editForm,
-        editFormValid,
-        titleRules,
-        openCreateDialog,
-        editMode,
-        viewQuizDetail,
-      };
-    },
+  const headers = [
+    { title: 'Quiz ID', value: 'id', width: '35%' },
+    { title: 'Title', value: 'title', width: '35%' },
+    { title: 'Created At', value: 'createdAt', width: '15%' },
+    { title: 'Actions', value: 'actions', sortable: false, width: '15%' },
+  ];
+  const route = useRouter();
+  const quizzes = ref<Quiz[]>([]);
+  const loading = ref(true);
+  const deleteDialog = ref({
+    show: false,
+    quiz: null as Quiz | null,
+    loading: false,
   });
+
+  const editDialog = ref({
+    show: false,
+    quiz: {} as Quiz,
+    loading: false,
+  });
+  const editFormValid = ref(false);
+  const editForm = ref<VForm | null>(null);
+  const editMode = ref<'create' | 'edit'>('edit');
+
+  const titleRules = [
+    (v: string) => !!v || 'Title is required',
+    (v: string) => v.length >= 3 || 'Title must be at least 3 characters',
+  ];
+
+  onMounted(() => {
+    const mockResponse = {
+      success: true,
+      data: [
+        {
+          id: '15f8db0f-84f7-4cc4-9bbd-2701cce57006',
+          title: 'History Quiz 101',
+          createdAt: '2025-04-30T16:01:46.355996',
+        },
+      ],
+      page: 0,
+      size: 10,
+      totalElements: 1,
+      totalPages: 1,
+      timestamp: '2025-05-03T21:36:25.173631',
+    };
+
+    setTimeout(() => {
+      if (mockResponse.success) {
+        quizzes.value = mockResponse.data as Quiz[];
+      } else {
+        console.error('Failed to fetch quizzes:', mockResponse);
+      }
+      loading.value = false;
+    }, 500);
+  });
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(
+      undefined,
+      {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }
+    );
+  };
+
+  const openDeleteDialog = (quiz: Quiz) => {
+    deleteDialog.value = {
+      show: true,
+      quiz,
+      loading: false,
+    };
+  };
+
+  const closeDeleteDialog = () => {
+    deleteDialog.value.show = false;
+    deleteDialog.value.quiz = null;
+  };
+
+  const confirmDeleteQuiz = () => {
+    if (!deleteDialog.value.quiz) return;
+
+    deleteDialog.value.loading = true;
+    // Simulate delete API call
+    setTimeout(() => {
+      // In a real application, you would call your delete API here
+      console.log('Deleting quiz:', deleteDialog.value.quiz);
+      // Remove the quiz from the list
+      quizzes.value = quizzes.value.filter(q => q.id !== deleteDialog.value.quiz!.id);
+      deleteDialog.value.loading = false;
+      closeDeleteDialog();
+    }, 500);
+  };
+
+  const openEditDialog = (quiz: Quiz) => {
+    editMode.value = 'edit';
+    editDialog.value = {
+      show: true,
+      quiz: { ...quiz },
+      loading: false,
+    };
+  };
+
+  const openCreateDialog = () => {
+    editMode.value = 'create';
+    editDialog.value = {
+      show: true,
+      quiz: {
+        id: '',
+        title: '',
+        createdAt: '',
+      },
+      loading: false,
+    };
+  };
+
+  const closeEditDialog = () => {
+    editDialog.value.show = false;
+    editDialog.value.quiz = {} as Quiz;
+  };
+
+  const saveEditQuiz = () => {
+    if (!editForm.value?.validate()) return;
+
+    editDialog.value.loading = true;
+    // Simulate save API call
+    setTimeout(() => {
+      // In a real application, you would call your update API here
+      console.log('Saving quiz:', editDialog.value.quiz);
+      if (editMode.value === 'edit') {
+        quizzes.value = quizzes.value.map(q =>
+          q.id === editDialog.value.quiz.id ? { ...editDialog.value.quiz } : q
+        );
+      } else {
+        const newQuiz = {
+          ...editDialog.value.quiz,
+          id: crypto.randomUUID(),
+          createdAt: new Date().toISOString(),
+        };
+        quizzes.value.push(newQuiz);
+      }
+
+      editDialog.value.loading = false;
+      closeEditDialog();
+    }, 500);
+  };
+
+  const viewQuizDetail = (quiz: Quiz) => {
+    route.push('/admin/quizzes/' + quiz.id);
+  };
 </script>

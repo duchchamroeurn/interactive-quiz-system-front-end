@@ -54,64 +54,40 @@
   </v-container>
 </template>
 
-<script lang="ts">
-  import { defineComponent, onMounted, ref } from 'vue';
+<script lang="ts" setup>
+  import { onMounted, ref } from 'vue';
+  import type { QuestionWithOptions } from '@/models/QuestionWithOptions';
 
-  interface Option {
-    id: string;
-    optionText: string;
-    correct: boolean;
-  }
+  const question = ref< QuestionWithOptions | null>(null);
+  const loading = ref(true);
 
-  interface Question {
-    id: string;
-    questionText: string;
-    time: number;
-    options: Option[];
-  }
+  onMounted(() => {
+    // Replace this with your actual API call to fetch question details by ID
+    const mockResponse = {
+      success: true,
+      data: {
+        id: '28fcbc1e-e87e-4ac9-b692-98deadd61e2e',
+        questionText: 'Who was the first president of the USA?',
+        time: 60,
+        options: [
+          { id: 'e33c4a87-0784-4573-b4df-236c8de41d0e', optionText: 'James Madison', correct: false },
+          { id: '7e7f88ab-0641-41e0-8e8d-5114b50bac38', optionText: 'Thomas Jefferson', correct: false },
+          { id: 'b5cb0f25-c272-46ed-ba31-6607306d225a', optionText: 'John Adams', correct: false },
+          { id: '7ce5cd88-52b9-4e78-9624-d67909bd5f4a', optionText: 'George Washington', correct: true },
+        ],
+      },
+      message: 'We found the question you were looking for.',
+      timestamp: '2025-05-03T22:10:25.998017',
+    };
 
-  export default defineComponent({
-    name: 'QuestionDetailPage',
-    components: {
-    },
-    setup () {
-      const question = ref<Question | null>(null);
-      const loading = ref(true);
-
-      onMounted(() => {
-        // Replace this with your actual API call to fetch question details by ID
-        const mockResponse = {
-          success: true,
-          data: {
-            id: '28fcbc1e-e87e-4ac9-b692-98deadd61e2e',
-            questionText: 'Who was the first president of the USA?',
-            time: 60,
-            options: [
-              { id: 'e33c4a87-0784-4573-b4df-236c8de41d0e', optionText: 'James Madison', correct: false },
-              { id: '7e7f88ab-0641-41e0-8e8d-5114b50bac38', optionText: 'Thomas Jefferson', correct: false },
-              { id: 'b5cb0f25-c272-46ed-ba31-6607306d225a', optionText: 'John Adams', correct: false },
-              { id: '7ce5cd88-52b9-4e78-9624-d67909bd5f4a', optionText: 'George Washington', correct: true },
-            ],
-          },
-          message: 'We found the question you were looking for.',
-          timestamp: '2025-05-03T22:10:25.998017',
-        };
-
-        setTimeout(() => {
-          if (mockResponse.success) {
-            question.value = mockResponse.data as Question;
-          } else {
-            console.error('Failed to fetch question details:', mockResponse);
-          //  Handle error (e.g., show a message to the user)
-          }
-          loading.value = false;
-        }, 500);
-      });
-
-      return {
-        question,
-        loading,
-      };
-    },
+    setTimeout(() => {
+      if (mockResponse.success) {
+        question.value = mockResponse.data as QuestionWithOptions;
+      } else {
+        console.error('Failed to fetch question details:', mockResponse);
+        //  Handle error (e.g., show a message to the user)
+      }
+      loading.value = false;
+    }, 500);
   });
 </script>

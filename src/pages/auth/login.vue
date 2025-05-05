@@ -48,56 +48,43 @@
   </div>
 </template>
 
-<script lang="ts">
-  import { defineComponent, ref } from 'vue';
+<script lang="ts" setup>
+  import { ref } from 'vue';
   import { useRouter } from 'vue-router';
 
-  export default defineComponent({
-    name: 'LoginPage',
-    setup () {
-      const router = useRouter();
-      const email = ref('');
-      const password = ref('');
-      const loading = ref(false);
-      const error = ref('');
+  const email = ref('');
+  const password = ref('');
+  const loading = ref(false);
+  const error = ref('');
+  const route = useRouter();
 
-      const handleLogin = async () => {
-        loading.value = true;
-        error.value = '';
-        // Simulate login process (replace with your actual authentication logic)
-        try {
-          // Simulate API call delay
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          router.push('/admin');
-          // if (email.value === 'test@example.com' && password.value === 'password') {
-          //   // Simulate successful login
-          //   // In a real app, you would get user data from the API
-          //   // and store it (e.g., in Vuex or a cookie)
-          //   localStorage.setItem('user', JSON.stringify({ email: email.value, token: 'fake-token' })); //store a fake token
-          //   router.push('/admin/dashboard'); // Redirect to quiz list
-          // } else {
-          //   error.value = 'Invalid credentials. Please try again.';
-          // }
-        } catch (err: unknown) {
-          if (err instanceof Error) {
-            error.value = err.message;
-          } else {
-            error.value = 'An error occurred during login.';
-          }
-        } finally {
-          loading.value = false;
-        }
-      };
-
-      return {
-        email,
-        password,
-        loading,
-        error,
-        handleLogin,
-      };
-    },
-  });
+  const handleLogin = async () => {
+    loading.value = true;
+    error.value = '';
+    // Simulate login process (replace with your actual authentication logic)
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      route.push('/admin');
+      // if (email.value === 'test@example.com' && password.value === 'password') {
+      //   // Simulate successful login
+      //   // In a real app, you would get user data from the API
+      //   // and store it (e.g., in Vuex or a cookie)
+      //   localStorage.setItem('user', JSON.stringify({ email: email.value, token: 'fake-token' })); //store a fake token
+      //   router.push('/admin/dashboard'); // Redirect to quiz list
+      // } else {
+      //   error.value = 'Invalid credentials. Please try again.';
+      // }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        error.value = err.message;
+      } else {
+        error.value = 'An error occurred during login.';
+      }
+    } finally {
+      loading.value = false;
+    }
+  };
 </script>
 
 <style scoped>

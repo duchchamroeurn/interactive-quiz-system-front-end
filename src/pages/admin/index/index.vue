@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-card flat>
       <v-card-title class="mb-4 text-h5 font-weight-bold pb-2">
         Overview
