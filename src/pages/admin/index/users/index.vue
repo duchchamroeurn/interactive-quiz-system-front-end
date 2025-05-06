@@ -31,7 +31,7 @@
           <v-card-text>
             <v-data-table
               :headers="headers"
-              :items="users"
+              :items="users == null ? [] : users"
               :loading="loading"
               no-data-text="No users found."
               no-results-text="No matching users found."
@@ -136,9 +136,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref } from 'vue';
+  import { ref } from 'vue';
   import type { VForm } from 'vuetify/components';
-  import { User, UserRole } from '@/models/user';
+  import { type User, UserRole } from '@/models/user';
+  import { useApi } from '@/composables/api';
 
   const headers = [
     { title: 'User ID', value: 'userId', width: '30%' },
@@ -147,9 +148,8 @@
     { title: 'Role', value: 'userRole', width: '15%' },
     { title: 'Actions', value: 'actions', sortable: false, width: '10%' },
   ];
+  const { data: users, loading: loading } = useApi<User[]>('http://localhost:9099/api/v1/user');
 
-  const users = ref<User[]>([]);
-  const loading = ref(true);
   const deleteDialog = ref({
     show: false,
     user: null as User | null,
@@ -178,93 +178,18 @@
   ]
   const userRoles = Object.values(UserRole);
 
-  onMounted(() => {
-    const mockResponse = {
-      success: true,
-      data: [
-        {
-          userId: '9e13dec7-bfff-4328-8e17-4a2e331cb031',
-          email: 'audience@gmail.com',
-          username: 'audience',
-          userRole: 'AUDIENCE',
-        },
-        {
-          userId: '40668c48-27d5-483a-8efc-a6674c5a35ac',
-          email: 'admin@gmail.com',
-          username: 'superadmin',
-          userRole: 'ADMIN',
-        },
-        {
-          userId: 'ce912d24-84d7-460b-ab3a-3827a375e6f0',
-          email: 'presenter@gmail.com',
-          username: 'presenter',
-          userRole: 'PRESENTER',
-        },
-        {
-          userId: '6153660d-93dd-46e0-8979-1d13ff3dc4eb',
-          email: 'audience001@gmail.com',
-          username: 'audience001',
-          userRole: 'AUDIENCE',
-        },
-        {
-          userId: 'dacd341c-f4ae-4308-a818-e489510588f9',
-          email: 'audience002@gmail.com',
-          username: 'audience002',
-          userRole: 'AUDIENCE',
-        },
-        {
-          userId: '578d0597-412b-4447-82d9-d6b83b0b853e',
-          email: 'audience003@gmail.com',
-          username: 'audience003',
-          userRole: 'AUDIENCE',
-        },
-        {
-          userId: '462510ef-49b3-4f03-a18d-283c18837815',
-          email: 'audience004@gmail.com',
-          username: 'audience004',
-          userRole: 'AUDIENCE',
-        },
-        {
-          userId: 'e09777b2-5349-45e1-b0d9-6271d2baf6df',
-          email: 'audience005@gmail.com',
-          username: 'audience005',
-          userRole: 'AUDIENCE',
-        },
-      ],
-      page: 0,
-      size: 10,
-      totalElements: 8,
-      totalPages: 1,
-      timestamp: '2025-05-03T17:11:50.745938',
-    };
-
-    setTimeout(() => {
-      if (mockResponse.success) {
-        users.value = mockResponse.data as User[];
-      } else {
-        console.error('Failed to fetch users:', mockResponse);
-      }
-      loading.value = false;
-    }, 500);
-  });
-
   const getRoleColor = (role: UserRole) => {
     switch (role) {
-      case 'ADMIN':
+      case UserRole.ADMIN:
         return 'red';
-      case 'PRESENTER':
+      case UserRole.PRESENTER:
         return 'primary';
-      case 'AUDIENCE':
+      case UserRole.AUDIENCE:
         return 'secondary';
       default:
         return 'grey';
     }
   };
-
-  // const editUser = (user: User) => {
-  //   // Implement your edit user logic here
-  //   console.log('Edit user:', user);
-  // };
 
   const openDeleteDialog = (user: User) => {
     deleteDialog.value = {
@@ -288,7 +213,9 @@
       // In a real application, you would call your delete API here
       console.log('Deleting user:', deleteDialog.value.user);
       // Remove the user from the list
-      users.value = users.value.filter(u => u.userId !== deleteDialog.value.user!.userId);
+      if(users.value != null) {
+        users.value = users.value.filter(u => u.userId !== deleteDialog.value.user!.userId);
+      }
       deleteDialog.value.loading = false;
       closeDeleteDialog();
     }, 500);
@@ -331,16 +258,20 @@
       // In a real application, you would call your update API here
       console.log('Saving user:', editDialog.value.user);
       if (editMode.value === 'edit'){
-        users.value = users.value.map(u =>
-          u.userId === editDialog.value.user.userId ? { ...editDialog.value.user } : u
-        );
+        if(users.value != null) {
+          users.value = users.value.map(u =>
+            u.userId === editDialog.value.user.userId ? { ...editDialog.value.user } : u
+          );
+        }
       }
       else{
         const newUser = {
           ...editDialog.value.user,
           userId: crypto.randomUUID(), // Generate a new ID
         };
-        users.value.push(newUser);
+        if(users.value != null) {
+          users.value.push(newUser);
+        }
       }
 
       editDialog.value.loading = false;

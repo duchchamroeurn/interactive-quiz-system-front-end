@@ -31,7 +31,7 @@
           <v-card-text>
             <v-data-table
               :headers="headers"
-              :items="quizzes"
+              :items="quizzes == null ? [] : quizzes"
               :loading="loading"
               no-data-text="No quizzes found."
               no-results-text="No matching quizzes found."
@@ -133,6 +133,7 @@
   import { useRouter } from 'vue-router';
   import type { VForm } from 'vuetify/components';
   import type { Quiz } from '@/models/quiz';
+  import { useApi } from '@/composables/api';
 
   const headers = [
     { title: 'Quiz ID', value: 'id', width: '35%' },
@@ -141,8 +142,9 @@
     { title: 'Actions', value: 'actions', sortable: false, width: '15%' },
   ];
   const route = useRouter();
-  const quizzes = ref<Quiz[]>([]);
-  const loading = ref(true);
+  const fetchQuiz = useApi<Quiz[]>('http://localhost:9099/api/v1/quiz')
+  const quizzes = fetchQuiz.data;
+  const loading = fetchQuiz.loading;
   const deleteDialog = ref({
     show: false,
     quiz: null as Quiz | null,
@@ -226,7 +228,7 @@
       // In a real application, you would call your delete API here
       console.log('Deleting quiz:', deleteDialog.value.quiz);
       // Remove the quiz from the list
-      quizzes.value = quizzes.value.filter(q => q.id !== deleteDialog.value.quiz!.id);
+      quizzes.value = quizzes.value!.filter(q => q.id !== deleteDialog.value.quiz!.id);
       deleteDialog.value.loading = false;
       closeDeleteDialog();
     }, 500);
@@ -268,7 +270,7 @@
       // In a real application, you would call your update API here
       console.log('Saving quiz:', editDialog.value.quiz);
       if (editMode.value === 'edit') {
-        quizzes.value = quizzes.value.map(q =>
+        quizzes.value = quizzes.value!.map(q =>
           q.id === editDialog.value.quiz.id ? { ...editDialog.value.quiz } : q
         );
       } else {
@@ -277,7 +279,7 @@
           id: crypto.randomUUID(),
           createdAt: new Date().toISOString(),
         };
-        quizzes.value.push(newQuiz);
+        quizzes.value!.push(newQuiz);
       }
 
       editDialog.value.loading = false;

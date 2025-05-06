@@ -31,7 +31,7 @@
           <v-card-text>
             <v-data-table
               :headers="headers"
-              :items="questions"
+              :items="questions ?? []"
               :loading="loading"
               no-data-text="No questions found."
               no-results-text="No matching questions found."
@@ -134,10 +134,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref } from 'vue';
+  import { ref } from 'vue';
   import { useRouter } from 'vue-router';
   import type { VForm } from 'vuetify/components';
   import type { Question } from '@/models/question';
+  import { useApi } from '@/composables/api';
 
   const headers = [
     { title: 'Question ID', value: 'id', width: '40%' },
@@ -146,8 +147,9 @@
     { title: 'Actions', value: 'actions', sortable: false, width: '10%' },
   ];
 
-  const questions = ref<Question[]>([]);
-  const loading = ref(true);
+  const fetchQuestion = useApi<Question[]>('http://localhost:9099/api/v1/question')
+  const questions = fetchQuestion.data;
+  const loading = fetchQuestion.loading;
   const route = useRouter();
   const deleteDialog = ref({
     show: false,
@@ -172,39 +174,6 @@
     (v: number) => !!v || 'Time Limit is required',
     (v: number) => v > 0 || 'Time Limit must be greater than 0',
   ];
-
-  onMounted(() => {
-    const mockResponse = {
-      success: true,
-      data: [
-        {
-          id: '28fcbc1e-e87e-4ac9-b692-98deadd61e2e',
-          questionText: 'Who was the first president of the USA?',
-          time: 60,
-        },
-        {
-          id: '651df2db-cc25-4133-972c-c3b093bed06d',
-          questionText: 'What year did World War II begin?',
-          time: 60,
-        },
-      ],
-      page: 0,
-      size: 10,
-      totalElements: 2,
-      totalPages: 1,
-      timestamp: '2025-05-03T22:06:34.508811',
-    };
-
-    setTimeout(() => {
-      if (mockResponse.success) {
-        questions.value = mockResponse.data as Question[];
-      } else {
-        console.error('Failed to fetch questions:', mockResponse);
-      }
-      loading.value = false;
-    }, 500);
-  });
-
   const openDeleteDialog = (question: Question) => {
     deleteDialog.value = {
       show: true,
@@ -227,7 +196,7 @@
       // In a real application, you would call your delete API here
       console.log('Deleting question:', deleteDialog.value.question);
       // Remove the question from the list
-      questions.value = questions.value.filter(q => q.id !== deleteDialog.value.question!.id);
+      questions.value = questions.value!.filter(q => q.id !== deleteDialog.value.question!.id);
       deleteDialog.value.loading = false;
       closeDeleteDialog();
     }, 500);
@@ -269,7 +238,7 @@
       // In a real application, you would call your update API here
       console.log('Saving question:', editDialog.value.question);
       if (editMode.value === 'edit') {
-        questions.value = questions.value.map(q =>
+        questions.value = questions.value!.map(q =>
           q.id === editDialog.value.question.id ? { ...editDialog.value.question } : q
         );
       } else {
@@ -277,7 +246,7 @@
           ...editDialog.value.question,
           id: crypto.randomUUID(),
         };
-        questions.value.push(newQuestion);
+        questions.value!.push(newQuestion);
       }
 
       editDialog.value.loading = false;

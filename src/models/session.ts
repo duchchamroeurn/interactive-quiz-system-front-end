@@ -1,4 +1,5 @@
 import type { QuizWithQuestionsOptions } from '@/models/quiz';
+import type { Participant } from './participant';
 
 export interface Session {
   sessionId: string;
@@ -9,4 +10,8 @@ export interface Session {
 
 export interface SessionWithQuizQuestionsOptions extends Session {
   quiz: QuizWithQuestionsOptions
+}
+
+export interface SessionWithParticipant extends Session {
+  participants: Participant[];
 }

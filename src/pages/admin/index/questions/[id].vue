@@ -5,7 +5,7 @@
         <v-card v-if="question" variant="text">
           <v-card-title> {{ question.questionText }}</v-card-title>
           <v-card-text>
-            <v-container>
+            <v-container fluid>
               <v-row
                 v-for="(item, index) in [
                   { label: 'Question ID', value: question.id },
@@ -14,7 +14,7 @@
                 :key="index"
               >
                 <v-col>
-                  <v-list-item-title>
+                  <v-list-item-title class="font-weight-medium">
                     {{ item.label }}:
                   </v-list-item-title>
                 </v-col>
@@ -55,41 +55,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref } from 'vue';
-  import type { QuestionWithOptions } from '@/models/QuestionWithOptions';
+  import { useApi } from '@/composables/api';
+  import type { QuestionWithOptions } from '@/models/question';
+  import { useRoute } from 'vue-router';
 
-  const question = ref< QuestionWithOptions | null>(null);
-  const loading = ref(true);
-
-  onMounted(() => {
-    // Replace this with your actual API call to fetch question details by ID
-    const mockResponse = {
-      success: true,
-      data: {
-        id: '28fcbc1e-e87e-4ac9-b692-98deadd61e2e',
-        questionText: 'Who was the first president of the USA?',
-        time: 60,
-        options: [
-          { id: 'e33c4a87-0784-4573-b4df-236c8de41d0e', optionText: 'James Madison', correct: false },
-          { id: '7e7f88ab-0641-41e0-8e8d-5114b50bac38', optionText: 'Thomas Jefferson', correct: false },
-          { id: 'b5cb0f25-c272-46ed-ba31-6607306d225a', optionText: 'John Adams', correct: false },
-          { id: '7ce5cd88-52b9-4e78-9624-d67909bd5f4a', optionText: 'George Washington', correct: true },
-        ],
-      },
-      message: 'We found the question you were looking for.',
-      timestamp: '2025-05-03T22:10:25.998017',
-    };
-
-    setTimeout(() => {
-      if (mockResponse.success) {
-        question.value = mockResponse.data as QuestionWithOptions;
-      } else {
-        console.error('Failed to fetch question details:', mockResponse);
-        //  Handle error (e.g., show a message to the user)
-      }
-      loading.value = false;
-    }, 500);
-  });
+  const route = useRoute();
+  const questionId = (route.params as { id: string }).id;
+  const fetchQuestionDetail = useApi<QuestionWithOptions>('http://localhost:9099/api/v1/question/' + questionId);
+  const question = fetchQuestionDetail.data;
 </script>
 <route lang="json">
   {

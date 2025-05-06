@@ -1,11 +1,6 @@
 <template>
   <v-app id="inspire">
     <v-navigation-drawer permanent>
-      <!-- <div class="logo">
-        <router-link class="logo-link" to="/admin">
-          Quiz System Admin
-        </router-link>
-      </div> -->
       <v-list>
         <v-list-item
           prepend-avatar="https://cdn.vuetifyjs.com/images/john.png"
@@ -41,7 +36,6 @@
       </v-list>
     </v-navigation-drawer>
     <v-app-bar class="elevation-1">
-      <!-- <v-app-bar-nav-icon @click="drawer = !drawer" /> -->
 
       <v-app-bar-title>{{ $route.meta.title }}</v-app-bar-title>
     </v-app-bar>
@@ -52,9 +46,6 @@
 </template>
 
 <script lang="ts" setup>
-  // import { computed } from 'vue';
-  // import { useRouter } from 'vue-router';
-
   const items = [
     { text: 'Dashboard', icon: 'mdi-view-dashboard', path: '/admin' },
     { text: 'Users', icon: 'mdi-account-multiple', path: '/admin/users' },
@@ -63,27 +54,4 @@
     { text: 'Questions', icon: 'mdi-help-circle', path: '/admin/questions' },
     { text: 'Options', icon: 'mdi-form-select', path: '/admin/options' },
   ];
-
-  // const router = useRouter();
-  // const getPageTitle = computed(() => {
-
-  //   const path = router.path;
-  //   switch (path) {
-  //     case '/admin':
-  //       return 'Dashboard';
-  //     case '/admin/users':
-  //       return 'Users';
-  //     case '/admin/sessions':
-  //       return 'Sessions';
-  //     case '/admin/quizzes':
-  //       return 'Quizzes';
-  //     case '/admin/questions':
-  //       return 'Questions';
-  //     case '/admin/options':
-  //       return 'Options';
-  //     default:
-  //       console.log(router.meta)
-  //       return router.meta;
-  //   }
-  // });
 </script>

@@ -31,7 +31,7 @@
           <v-card-text>
             <v-data-table
               :headers="headers"
-              :items="sessions"
+              :items="sessions ?? []"
               :loading="loading"
               no-data-text="No sessions found."
               no-results-text="No matching sessions found."
@@ -164,10 +164,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref } from 'vue';
+  import { ref } from 'vue';
   import { useRouter } from 'vue-router';
   import type { VForm } from 'vuetify/components';
-  import { Session } from '@/models/session';
+  import type { Session } from '@/models/session';
+  import { useApi } from '@/composables/api';
 
   const headers = [
     { title: 'Session ID', value: 'sessionId', width: '30%' },
@@ -177,8 +178,9 @@
     { title: 'Actions', value: 'actions', sortable: false, width: '10%' },
   ];
 
-  const sessions = ref<Session[]>([]);
-  const loading = ref(true);
+  const response = useApi<Session[]>('http://localhost:9099/api/v1/session')
+  const sessions = response.data
+  const loading = response.loading
   const route = useRouter();
   const deleteDialog = ref({
     show: false,
@@ -204,40 +206,6 @@
     (v: string) => !!v || 'Session Code is required',
     (v: string) => /^[A-Z0-9]{10}$/.test(v) || 'Session Code must be 10 characters alphanumeric',
   ];
-
-  onMounted(() => {
-    const mockResponse = {
-      success: true,
-      data: [
-        {
-          sessionId: '19309a83-fdb2-48eb-a934-df23542c80d8',
-          sessionCode: 'OUG8DDRWZY',
-          startTime: '2025-05-01T20:04:24.404122',
-          endTime: '2025-05-01T20:37:53.514039',
-        },
-        {
-          sessionId: '18299c25-f7de-4bc0-a65c-e0a6207ab78e',
-          sessionCode: '90MDL25MGQ',
-          startTime: '2025-05-01T21:20:12.52856',
-          endTime: null,
-        },
-      ],
-      page: 0,
-      size: 10,
-      totalElements: 2,
-      totalPages: 1,
-      timestamp: '2025-05-03T22:34:17.398455',
-    };
-
-    setTimeout(() => {
-      if (mockResponse.success) {
-        sessions.value = mockResponse.data as Session[];
-      } else {
-        console.error('Failed to fetch sessions:', mockResponse);
-      }
-      loading.value = false;
-    }, 500);
-  });
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -275,7 +243,7 @@
       // In a real application, you would call your delete API here
       console.log('Deleting session:', deleteDialog.value.session);
       // Remove the session from the list
-      sessions.value = sessions.value.filter(s => s.sessionId !== deleteDialog.value.session!.sessionId);
+      sessions.value = sessions.value!.filter(s => s.sessionId !== deleteDialog.value.session!.sessionId);
       deleteDialog.value.loading = false;
       closeDeleteDialog();
     }, 500);
@@ -303,7 +271,7 @@
       // In a real application, you would call your end session API here
       console.log('Ending session:', endSessionDialog.value.session);
       // Update the session in the list
-      sessions.value = sessions.value.map(s =>
+      sessions.value = sessions.value!.map(s =>
         s.sessionId === endSessionDialog.value.session!.sessionId ? { ...s, endTime: new Date().toISOString() } : s
       );
       endSessionDialog.value.loading = false;
@@ -339,7 +307,7 @@
       // In a real application, you would call your update API here
       console.log('Saving session:', editDialog.value.session);
       if (editMode.value === 'edit') {
-        sessions.value = sessions.value.map(s =>
+        sessions.value = sessions.value!.map(s =>
           s.sessionId === editDialog.value.session.sessionId ? { ...editDialog.value.session } : s
         );
       } else {
@@ -349,7 +317,7 @@
           startTime: new Date().toISOString(),
           endTime: null,
         };
-        sessions.value.push(newSession);
+        sessions.value!.push(newSession);
       }
 
       editDialog.value.loading = false;
@@ -372,4 +340,4 @@
       "requiresAuth": true
     }
   }
-  </route>
+</route>
