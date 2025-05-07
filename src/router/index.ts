@@ -5,6 +5,7 @@
  */
 
 // Composables
+import { useAuthStore } from '@/composables/auth'
 import { createRouter, createWebHistory } from 'vue-router/auto'
 import { routes } from 'vue-router/auto-routes'
 
@@ -31,10 +32,18 @@ router.onError((err, to) => {
 })
 
 router.beforeEach((to, from, next) => {
+  const authState = useAuthStore();
   document.title = to.meta.title + ' | ' + appName
-  console.log(from)
 
-  next();
+  if (to.meta.requiresAuth && !authState.isAuthenticated) {
+    next('/auth/login')
+  } else if(to.meta.requiresAuth == false && authState.isAuthenticated) {
+    next('/admin')
+  }
+  else {
+    //  Otherwise, allow access to the route
+    next();
+  }
 });
 
 router.isReady().then(() => {

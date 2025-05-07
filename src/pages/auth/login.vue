@@ -29,12 +29,12 @@
               type="password"
             >
           </div>
-          <button class="login-button" :disabled="loading" type="submit">
-            <span v-if="loading" class="spinner" />
+          <button class="login-button" :disabled="authState.loading" type="submit">
+            <span v-if="authState.loading" class="spinner" />
             <span v-else>Login</span>
           </button>
-          <div v-if="error" class="error-message">
-            {{ error }}
+          <div v-if="authState.error" class="error-message">
+            {{ authState.error }}
           </div>
         </form>
         <div class="signup-link">
@@ -49,40 +49,20 @@
 </template>
 
 <script lang="ts" setup>
+  import { useAuthStore } from '@/composables/auth';
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
 
+  const auth = useAuthStore();
   const email = ref('');
   const password = ref('');
-  const loading = ref(false);
-  const error = ref('');
-  const route = useRouter();
+  const authState = auth.$state
+  const router = useRouter();
 
   const handleLogin = async () => {
-    loading.value = true;
-    error.value = '';
-    // Simulate login process (replace with your actual authentication logic)
-    try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      route.push('/admin');
-      // if (email.value === 'test@example.com' && password.value === 'password') {
-      //   // Simulate successful login
-      //   // In a real app, you would get user data from the API
-      //   // and store it (e.g., in Vuex or a cookie)
-      //   localStorage.setItem('user', JSON.stringify({ email: email.value, token: 'fake-token' })); //store a fake token
-      //   router.push('/admin/dashboard'); // Redirect to quiz list
-      // } else {
-      //   error.value = 'Invalid credentials. Please try again.';
-      // }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        error.value = err.message;
-      } else {
-        error.value = 'An error occurred during login.';
-      }
-    } finally {
-      loading.value = false;
+    await auth.signUp(email.value, password.value);
+    if(auth.isAuthenticated) {
+      router.go(0)
     }
   };
 </script>
