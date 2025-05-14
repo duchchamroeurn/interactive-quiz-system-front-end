@@ -1,6 +1,7 @@
 import type { Quiz } from '@/models/quiz';
 import router from '@/router';
 import { quizService } from '@/services/quiz';
+import { simulateDelay } from '@/utils/delay';
 import { reactive, ref } from 'vue';
 import type { VForm } from 'vuetify/components';
 
@@ -34,6 +35,7 @@ class QuizViewModel {
   async fetchQuizzes () {
     this.model.loading = true
     try{
+      await simulateDelay()
       const quizzes = await quizService.getQuizzes();
       this.model.quizzes = quizzes;
     } catch(error) {

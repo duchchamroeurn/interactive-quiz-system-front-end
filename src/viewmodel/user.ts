@@ -50,9 +50,14 @@ class UserViewModel {
     user: {} as User,
   })
 
+  private simulateDelay (ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   async fetchListUser () {
     this.listUserModel.loading = true
     try {
+      await this.simulateDelay(500);
       const users = await userService.getUsers()
       this.listUserModel.users = users
     } catch (error) {

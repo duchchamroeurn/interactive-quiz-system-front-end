@@ -1,11 +1,13 @@
 import type { SessionWithQuizQuestionsOptions } from '@/models/session';
 import { sessionService } from '@/services/session';
 import { dateUtils } from '@/utils/date';
+import { simulateDelay } from '@/utils/delay';
 import { reactive } from 'vue';
 
 class SessionDetailViewModel {
 
   readonly model = reactive({
+    loading: false,
     session: null as SessionWithQuizQuestionsOptions | null,
   })
 
@@ -34,14 +36,16 @@ class SessionDetailViewModel {
   }
 
   async fetchSessionDetail (sessionId: string) {
+    this.model.loading = true;
     try {
+      await simulateDelay()
       const sessionDetail = await sessionService.detailSession(sessionId);
-      this.model.session = sessionDetail
+      this.model.session = sessionDetail;
       console.log('result ', sessionDetail)
     } catch(error) {
       console.log('error ', error)
     } finally {
-      console.log('End..')
+      this.model.loading = false;
     }
 
   }

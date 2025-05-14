@@ -1,6 +1,12 @@
 <template>
   <v-container fluid>
-    <v-card>
+    <v-skeleton-loader
+      v-if="sessionDetailViewModel.model.loading"
+      class="mx-auto"
+      :loading="sessionDetailViewModel.model.loading"
+      type="card, subtitle, article, list-item"
+    />
+    <v-card v-else>
       <v-card-title>Session</v-card-title>
       <div v-if="sessionDetailViewModel.model.session">
         <v-card-subtitle>
@@ -77,9 +83,6 @@
           </v-card-text>
         </v-card-text>
       </div>
-      <v-card-text v-else>
-        <p>Loading session details...</p>
-      </v-card-text>
     </v-card>
   </v-container>
 </template>

@@ -1,5 +1,6 @@
 import type { Option } from '@/models/option';
 import { optionService } from '@/services/option';
+import { simulateDelay } from '@/utils/delay';
 import { reactive, ref } from 'vue';
 import type { VForm } from 'vuetify/components';
 
@@ -37,6 +38,7 @@ class OptionViewModel {
   async fetchOptions () {
     this.model.loading = true;
     try {
+      await simulateDelay()
       const options = await optionService.getOptions();
       this.model.options = options;
     } catch(error) {

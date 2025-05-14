@@ -2,6 +2,7 @@ import { ResponseError } from '@/models/error';
 import type { Session } from '@/models/session';
 import router from '@/router';
 import { sessionService } from '@/services/session';
+import { simulateDelay } from '@/utils/delay';
 import { reactive, ref } from 'vue';
 import type { VForm } from 'vuetify/components';
 
@@ -46,6 +47,7 @@ class SessionViewModel {
   async fetchListSession () {
     this.sessionListModel.loading = true;
     try{
+      await simulateDelay()
       const listSession = await sessionService.getSessions();
       this.sessionListModel.sessions = listSession;
     } catch (error) {

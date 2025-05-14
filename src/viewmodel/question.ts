@@ -1,6 +1,7 @@
 import type { Question } from '@/models/question';
 import router from '@/router';
 import { questionService } from '@/services/question';
+import { simulateDelay } from '@/utils/delay';
 import { reactive, ref } from 'vue';
 import type { VForm } from 'vuetify/components';
 
@@ -44,6 +45,7 @@ class QuestionViewModel {
   async fetchQuestions () {
     this.model.loading = true;
     try {
+      await simulateDelay()
       const questions = await questionService.getQuestions();
       this.model.questions = questions
     }catch(error) {

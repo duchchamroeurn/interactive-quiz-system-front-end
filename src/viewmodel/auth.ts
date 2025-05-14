@@ -2,6 +2,7 @@ import { localStorageService } from '@/composables/store'
 import { ResponseError } from '@/models/error'
 import router from '@/router'
 import { authService } from '@/services/auth'
+import { simulateDelay } from '@/utils/delay'
 import { reactive } from 'vue'
 
 class AuthViewModel {
@@ -17,7 +18,7 @@ class AuthViewModel {
   readonly login = async () => {
     this.model.loading = true
     this.model.error = ''
-    await authService.simulateDelay(500)
+    await simulateDelay()
     try {
       const user = await authService.signIn(this.model.email, this.model.password)
       localStorageService.saveUser(user)
