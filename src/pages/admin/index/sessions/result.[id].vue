@@ -1,16 +1,12 @@
 <template>
   <v-container fluid>
     <v-card>
-      <v-card-text v-if="sessionData">
+      <v-card-text v-if="sessionResultViewModel.model.sessionResult">
         <v-card variant="text">
           <v-card-text>
             <v-container fluid>
               <v-row
-                v-for="(item, index) in [
-                  { label: 'Session ID', value: sessionData.sessionId },
-                  { label: 'Session Code', value: sessionData.sessionCode },
-                  { label: 'Start Time', value: formatDate(sessionData.startTime) },
-                  { label: 'End Time', value: sessionData.endTime ? formatDate(sessionData.endTime) : 'Ongoing' }]"
+                v-for="(item, index) in sessionResultViewModel.sectionSessionResult"
                 :key="index"
               >
                 <v-col>
@@ -34,9 +30,9 @@
           </v-card-title>
           <v-card-text>
             <v-data-table
-              :headers="headers"
-              :items="sessionData.participants"
-              :loading="loading"
+              :headers="sessionResultViewModel.headers"
+              :items="sessionResultViewModel.model.sessionResult.participants"
+              :loading="sessionResultViewModel.model.loading"
               no-data-text="No participants found."
               no-results-text="No matching participants found."
             >
@@ -52,7 +48,7 @@
                     icon
                     size="small"
                     title="View Quiz Detail"
-                    @click="viewQuizDetail(item)"
+                    @click="sessionResultViewModel.viewQuizDetail(item)"
                   >
                     <v-icon>mdi-eye</v-icon>
                   </v-btn>
@@ -70,45 +66,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { useApi } from '@/composables/api';
-  import type { Participant } from '@/models/participant';
-  import type { SessionWithParticipant } from '@/models/session';
-  import { useRoute, useRouter } from 'vue-router';
-
-  const headers = [
-    { title: 'User ID', value: 'userId' },
-    { title: 'Email', value: 'email' },
-    { title: 'Username', value: 'username' },
-    { title: 'Exam Result', value: 'examResult' },
-    { title: 'Total Point', value: 'totalPoint' },
-    { title: 'Earned Point', value: 'totalEarnedPoint' },
-    { title: 'Percentage', value: 'percentage' },
-    { title: 'Actions', value: 'actions', sortable: false },
-  ];
+  import { sessionResultViewModel } from '@/viewmodel/session.result';
+  import { useRoute } from 'vue-router';
 
   const route = useRoute();
-  const router = useRouter();
   const sessionId = (route.params as { id: string }).id;
-  const fetchResultBySession = useApi<SessionWithParticipant>('http://localhost:9099/api/v1/answer/session/' + sessionId);
-  const sessionData = fetchResultBySession.data;
-  const loading = fetchResultBySession.loading
+  sessionResultViewModel.fetchResultBySession(sessionId)
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(
-      undefined,
-      {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-      }
-    );
-  };
-
-  const viewQuizDetail = (participant: Participant) => {
-    router.push('/admin/sessions/'+ sessionId +'/user/' + participant.userId)
-  };
 </script>
 <route lang="json">
   {

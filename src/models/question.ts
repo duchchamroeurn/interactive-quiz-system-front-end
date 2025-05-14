@@ -1,11 +1,16 @@
-import type { Option } from '@/models/option';
+import { optionSchema } from '@/models/option';
+import { z } from 'zod';
 
-export interface Question {
-  id: string;
-  questionText: string;
-  time: number;
-}
+export const questionSchema = z.object({
+  id: z.string().uuid(),
+  questionText: z.string(),
+  time: z.number(),
+})
 
-export interface QuestionWithOptions extends Question {
-  options: Option[];
-}
+export type Question = z.infer<typeof questionSchema>
+
+export const questionWithOptionSchema = questionSchema.extend({
+  options: z.array(optionSchema),
+})
+
+export type QuestionWithOptions = z.infer<typeof questionWithOptionSchema>

@@ -2,15 +2,12 @@
   <v-container fluid>
     <v-row>
       <v-col>
-        <v-card v-if="question" variant="text">
-          <v-card-title> {{ question.questionText }}</v-card-title>
+        <v-card v-if="questionDetailViewModel.model.questionDetail" variant="text">
+          <v-card-title> {{ questionDetailViewModel.model.questionDetail.questionText }}</v-card-title>
           <v-card-text>
             <v-container fluid>
               <v-row
-                v-for="(item, index) in [
-                  { label: 'Question ID', value: question.id },
-                  { label: 'Time Limit', value: `${question.time} seconds `},
-                ]"
+                v-for="(item, index) in questionDetailViewModel.sectionQuestion"
                 :key="index"
               >
                 <v-col>
@@ -31,7 +28,7 @@
                     <v-card-text>
                       <v-list>
                         <v-list-item
-                          v-for="(option, i) in question.options"
+                          v-for="(option, i) in questionDetailViewModel.model.questionDetail.options"
                           :key="option.id"
                           :active="option.correct"
                           color="success"
@@ -55,14 +52,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { useApi } from '@/composables/api';
-  import type { QuestionWithOptions } from '@/models/question';
+  import { questionDetailViewModel } from '@/viewmodel/question .[id]';
   import { useRoute } from 'vue-router';
 
   const route = useRoute();
   const questionId = (route.params as { id: string }).id;
-  const fetchQuestionDetail = useApi<QuestionWithOptions>('http://localhost:9099/api/v1/question/' + questionId);
-  const question = fetchQuestionDetail.data;
+  questionDetailViewModel.fetchQuestionDetail(questionId);
+
 </script>
 <route lang="json">
   {

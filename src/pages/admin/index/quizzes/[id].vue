@@ -7,13 +7,9 @@
           <v-card-text>
             <v-card variant="text">
               <v-card-text>
-                <v-container v-if="quiz" fluid>
+                <v-container v-if="quizDetailViewModel.model.quizDetail" fluid>
                   <v-row
-                    v-for="(item, index) in [
-                      { label: 'Quiz ID', value: quiz.id },
-                      { label: 'Title', value: quiz.title },
-                      { label: 'Created At', value: formatDate(quiz.createdAt) },
-                    ]"
+                    v-for="(item, index) in quizDetailViewModel.sectionQuiz "
                     :key="index"
                   >
                     <v-col>
@@ -31,11 +27,11 @@
                     <v-col>
                       <v-card variant="text">
                         <v-card-title>
-                          Questions ({{ quiz.questions.length }})
+                          Questions ({{ quizDetailViewModel.model.quizDetail.questions.length }})
                         </v-card-title>
                         <v-card-text>
                           <v-container fluid>
-                            <v-row v-for="(question, index) in quiz.questions" :key="index">
+                            <v-row v-for="(question, index) in quizDetailViewModel.model.quizDetail.questions" :key="index">
                               <v-col>
                                 <v-card>
                                   <v-card-title>
@@ -75,28 +71,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { useApi } from '@/composables/api';
-  import type { QuizWithQuestionsOptions } from '@/models/quiz';
+  import { quizDetailViewModel } from '@/viewmodel/quiz.[id]';
   import { useRoute } from 'vue-router';
 
   const route = useRoute();
   const quizId = (route.params as { id: string }).id;
-  const fetchQuizDetail = useApi<QuizWithQuestionsOptions>('http://localhost:9099/api/v1/quiz/' + quizId)
-  const quiz = fetchQuizDetail.data;
+  quizDetailViewModel.fetchQuizDetail(quizId);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(
-      undefined,
-      {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }
-    );
-  };
 </script>
 <route lang="json">
   {

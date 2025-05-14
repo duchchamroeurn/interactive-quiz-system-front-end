@@ -2,15 +2,11 @@
   <v-container fluid>
     <v-card>
       <v-card-title>Session</v-card-title>
-      <div v-if="session">
+      <div v-if="sessionDetailViewModel.model.session">
         <v-card-subtitle>
           <v-container fluid>
             <v-row
-              v-for="(item, index) in [
-                { label: 'Session ID', value: session.sessionId },
-                { label: 'Session Code', value: session.sessionCode },
-                { label: 'Start Time', value: formatDate(session.startTime) },
-                { label: 'End Time', value: session.endTime ? formatDate(session.endTime) : 'Ongoing' }]"
+              v-for="(item, index) in sessionDetailViewModel.sectionSession"
               :key="index"
             >
               <v-col>
@@ -34,10 +30,7 @@
             <v-card-subtitle>
               <v-container fluid>
                 <v-row
-                  v-for="(item, index) in [
-                    { label: 'Quiz ID', value: session.quiz.id },
-                    { label: 'Title', value: session.quiz.title },
-                    { label: 'Created At', value: formatDate(session.quiz.createdAt) }]"
+                  v-for="(item, index) in sessionDetailViewModel.sectionQuiz"
                   :key="index"
                 >
                   <v-col>
@@ -58,11 +51,11 @@
             <v-container fluid>
               <v-card variant="text">
                 <v-card-title>
-                  Questions ({{ session.quiz.questions.length }})
+                  Questions ({{ sessionDetailViewModel.model.session.quiz.questions.length }})
                 </v-card-title>
                 <v-card-text>
                   <v-list>
-                    <v-list-group v-for="(question, index) in session.quiz.questions" :key="question.id" :value="question.questionText">
+                    <v-list-group v-for="(question, index) in sessionDetailViewModel.model.session.quiz.questions" :key="question.id" :value="question.questionText">
                       <template #activator="{ props }">
                         <v-list-item
                           v-bind="props"
@@ -92,28 +85,13 @@
 </template>
 
 <script lang="ts" setup>
-  import type { SessionWithQuizQuestionsOptions } from '@/models/session';
-  import { useApi } from '@/composables/api';
+  import { sessionDetailViewModel } from '@/viewmodel/session.[id]';
   import { useRoute } from 'vue-router';
 
   const route = useRoute();
   const sessionCode = (route.params as { id: string }).id;
-  const response = useApi<SessionWithQuizQuestionsOptions>('http://localhost:9099/api/v1/session/'+ sessionCode)
-  const session = response.data
+  sessionDetailViewModel.fetchSessionDetail(sessionCode)
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(
-      undefined,
-      {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }
-    );
-  };
 </script>
 <route lang="json">
   {

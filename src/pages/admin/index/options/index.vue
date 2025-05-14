@@ -14,7 +14,7 @@
                 <v-btn
                   class="ml-4"
                   color="primary"
-                  @click="openCreateDialog"
+                  @click="optionViewModel.openCreateDialog"
                 >
                   <v-icon class="mr-2">mdi-plus</v-icon>
                   Create Option
@@ -30,9 +30,9 @@
         <v-card>
           <v-card-text>
             <v-data-table
-              :headers="headers"
-              :items="options ?? []"
-              :loading="loading"
+              :headers="optionViewModel.headers"
+              :items="optionViewModel.model.options"
+              :loading="optionViewModel.model.loading"
               no-data-text="No options found."
               no-results-text="No matching options found."
             >
@@ -49,7 +49,7 @@
                     icon
                     size="small"
                     title="Edit Option"
-                    @click="openEditDialog(item)"
+                    @click="optionViewModel.openEditDialog(item)"
                   >
                     <v-icon>mdi-pencil</v-icon>
                   </v-btn>
@@ -58,7 +58,7 @@
                     icon
                     size="small"
                     title="Delete Option"
-                    @click="openDeleteDialog(item)"
+                    @click="optionViewModel.openDeleteDialog(item)"
                   >
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
@@ -69,53 +69,53 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-dialog v-model="deleteDialog.show" max-width="500">
+    <v-dialog v-model="optionViewModel.model.deleteDialog.show" max-width="500">
       <v-card>
         <v-card-title>Confirm Deletion</v-card-title>
         <v-card-text>
-          Are you sure you want to delete option: <strong>{{ deleteDialog.option?.optionText }}</strong>?
+          Are you sure you want to delete option: <strong>{{ optionViewModel.model.deleteDialog.option?.optionText }}</strong>?
           This action cannot be undone.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" @click="closeDeleteDialog">Cancel</v-btn>
-          <v-btn color="red" :loading="deleteDialog.loading" @click="confirmDeleteOption">
-            <span v-if="deleteDialog.loading">Deleting...</span>
+          <v-btn color="grey" @click="optionViewModel.closeDeleteDialog">Cancel</v-btn>
+          <v-btn color="red" :loading="optionViewModel.model.deleteDialog.loading" @click="optionViewModel.confirmDeleteOption">
+            <span v-if="optionViewModel.model.deleteDialog.loading">Deleting...</span>
             <span v-else>Delete</span>
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="editDialog.show" max-width="500">
+    <v-dialog v-model="optionViewModel.model.editDialog.show" max-width="500">
       <v-card>
         <v-card-title>
-          {{ editMode === 'create' ? 'Create Option' : 'Edit Option' }}
+          {{ optionViewModel.model.editMode === 'create' ? 'Create Option' : 'Edit Option' }}
         </v-card-title>
         <v-card-text>
-          <v-form ref="editForm" v-model="editFormValid">
+          <v-form :ref="optionViewModel.editForm" v-model="optionViewModel.model.editFormValid">
             <v-text-field
-              v-model="editDialog.option.optionText"
+              v-model="optionViewModel.model.editDialog.option.optionText"
               label="Option Text"
               required
-              :rules="optionTextRules"
+              :rules="optionViewModel.optionTextRules"
             />
             <v-checkbox
-              v-model="editDialog.option.correct"
+              v-model="optionViewModel.model.editDialog.option.correct"
               label="Correct"
             />
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" @click="closeEditDialog">Cancel</v-btn>
+          <v-btn color="grey" @click="optionViewModel.closeEditDialog">Cancel</v-btn>
           <v-btn
             color="blue"
-            :disabled="!editFormValid"
-            :loading="editDialog.loading"
-            @click="saveEditOption"
+            :disabled="!optionViewModel.model.editFormValid"
+            :loading="optionViewModel.model.editDialog.loading"
+            @click="optionViewModel.saveEditOption"
           >
-            <span v-if="editDialog.loading">Saving...</span>
+            <span v-if="optionViewModel.model.editDialog.loading">Saving...</span>
             <span v-else>Save</span>
           </v-btn>
         </v-card-actions>
@@ -125,120 +125,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { useApi } from '@/composables/api';
-  import type { Option } from '@/models/option';
-  import { ref } from 'vue';
-  import type { VForm } from 'vuetify/components';
+  import { optionViewModel } from '@/viewmodel/option';
 
-  const headers = [
-    { title: 'Option ID', value: 'id', width: '40%' },
-    { title: 'Option Text', value: 'optionText', width: '40%' },
-    { title: 'Correct', value: 'correct', width: '10%' },
-    { title: 'Actions', value: 'actions', sortable: false, width: '10%' },
-  ];
+  optionViewModel.fetchOptions();
 
-  const fetchOptions = useApi<Option[]>('http://localhost:9099/api/v1/option')
-  const options = fetchOptions.data
-  const loading = fetchOptions.loading
-  const deleteDialog = ref({
-    show: false,
-    option: null as Option | null,
-    loading: false,
-  });
-
-  const editDialog = ref({
-    show: false,
-    option: {} as Option,
-    loading: false,
-  });
-  const editFormValid = ref(false);
-  const editForm = ref<VForm | null>(null);
-  const editMode = ref<'create' | 'edit'>('edit');
-
-  const optionTextRules = [
-    (v: string) => !!v || 'Option Text is required',
-    (v: string) => v.length >= 1 || 'Option Text must be at least 1 character',
-  ];
-
-  const openDeleteDialog = (option: Option) => {
-    deleteDialog.value = {
-      show: true,
-      option,
-      loading: false,
-    };
-  };
-
-  const closeDeleteDialog = () => {
-    deleteDialog.value.show = false;
-    deleteDialog.value.option = null;
-  };
-
-  const confirmDeleteOption = () => {
-    if (!deleteDialog.value.option) return;
-
-    deleteDialog.value.loading = true;
-    // Simulate delete API call
-    setTimeout(() => {
-      // In a real application, you would call your delete API here
-      console.log('Deleting option:', deleteDialog.value.option);
-      // Remove the option from the list
-      options.value = options.value!.filter(o => o.id !== deleteDialog.value.option!.id);
-      deleteDialog.value.loading = false;
-      closeDeleteDialog();
-    }, 500);
-  };
-
-  const openEditDialog = (option: Option) => {
-    editMode.value = 'edit';
-    editDialog.value = {
-      show: true,
-      option: { ...option },
-      loading: false,
-    };
-  };
-
-  const openCreateDialog = () => {
-    editMode.value = 'create';
-    editDialog.value = {
-      show: true,
-      option: {
-        id: '',
-        optionText: '',
-        correct: false,
-      },
-      loading: false,
-    };
-  };
-
-  const closeEditDialog = () => {
-    editDialog.value.show = false;
-    editDialog.value.option = {} as Option;
-  };
-
-  const saveEditOption = () => {
-    if (!editForm.value?.validate()) return;
-
-    editDialog.value.loading = true;
-    // Simulate save API call
-    setTimeout(() => {
-      // In a real application, you would call your update API here
-      console.log('Saving option:', editDialog.value.option);
-      if (editMode.value === 'edit') {
-        options.value = options.value!.map(o =>
-          o.id === editDialog.value.option.id ? { ...editDialog.value.option } : o
-        );
-      } else {
-        const newOption = {
-          ...editDialog.value.option,
-          id: crypto.randomUUID(),
-        };
-        options.value!.push(newOption);
-      }
-
-      editDialog.value.loading = false;
-      closeEditDialog();
-    }, 500);
-  };
 </script>
 <route lang="json">
   {

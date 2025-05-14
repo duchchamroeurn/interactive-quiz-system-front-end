@@ -5,7 +5,7 @@
  */
 
 // Composables
-import { useAuthStore } from '@/composables/auth'
+import { guard } from '@/router/guard'
 import { createRouter, createWebHistory } from 'vue-router/auto'
 import { routes } from 'vue-router/auto-routes'
 
@@ -13,8 +13,6 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
-
-const appName: string = import.meta.env.VITE_APP_NAME
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
@@ -30,21 +28,7 @@ router.onError((err, to) => {
     console.error(err)
   }
 })
-
-router.beforeEach((to, from, next) => {
-  const authState = useAuthStore();
-  document.title = to.meta.title + ' | ' + appName
-
-  if (to.meta.requiresAuth && !authState.isAuthenticated) {
-    next('/auth/login')
-  } else if(to.meta.requiresAuth == false && authState.isAuthenticated) {
-    next('/admin')
-  }
-  else {
-    //  Otherwise, allow access to the route
-    next();
-  }
-});
+router.beforeEach(guard)
 
 router.isReady().then(() => {
   localStorage.removeItem('vuetify:dynamic-reload')

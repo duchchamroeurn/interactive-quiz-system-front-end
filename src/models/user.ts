@@ -1,12 +1,13 @@
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  PRESENTER = 'PRESENTER',
-  AUDIENCE = 'AUDIENCE'
-}
+import { z } from 'zod';
 
-export interface User {
-  userId: string;
-  email: string;
-  username: string;
-  userRole: UserRole;
-}
+export const userRoleSchema = z.enum(['ADMIN', 'AUDIENCE', 'PRESENTER']);
+
+export const userSchema = z.object({
+  userId: z.string().uuid(),
+  email: z.string().email(),
+  username: z.string(),
+  userRole: userRoleSchema,
+});
+
+export type User = z.infer<typeof userSchema>;
+export type UserRole = z.infer<typeof userRoleSchema>;
