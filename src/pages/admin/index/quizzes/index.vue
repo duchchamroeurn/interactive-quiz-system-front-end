@@ -37,7 +37,7 @@
               no-results-text="No matching quizzes found."
             >
               <template #[`item.createdAt`]="{ item }">
-                {{ quizViewModel.formatDate(item.createdAt) }}
+                {{ dateUtils.formatDate(item.createdAt) }}
               </template>
               <template #[`item.actions`]="{ item }">
                 <div class="d-flex justify-end">
@@ -129,6 +129,7 @@
   </v-container></template>
 
 <script lang="ts" setup>
+  import { dateUtils } from '@/utils/date';
   import { quizViewModel } from '@/viewmodel/quiz';
 
   quizViewModel.fetchQuizzes();
