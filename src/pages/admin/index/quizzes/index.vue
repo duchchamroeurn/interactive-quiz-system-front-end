@@ -1,5 +1,5 @@
 <template>
-  <main-content-list :loading="quizViewModel.model.loading" @create="quizViewModel.openCreateDialog()">
+  <main-content-list :loading="false" @create="quizViewModel.openCreateDialog()">
     <template #title>
       Quiz List
     </template>
@@ -7,12 +7,15 @@
       Create Quiz
     </template>
     <template #content>
-      <v-data-table
+      <v-data-table-server
+        v-model:items-per-page="quizViewModel.model.itemsPerPage"
         :headers="quizViewModel.headers"
         :items="quizViewModel.model.quizzes"
+        :items-length="quizViewModel.model.totalQuiz"
         :loading="quizViewModel.model.loading"
         no-data-text="No quizzes found."
         no-results-text="No matching quizzes found."
+        @update:options="quizViewModel.fetchQuizzes"
       >
         <template #[`item.createdAt`]="{ item }">
           {{ dateUtils.formatDate(item.createdAt) }}
@@ -50,7 +53,7 @@
             </v-btn>
           </div>
         </template>
-      </v-data-table>
+      </v-data-table-server>
     </template>
     <template #dialogs>
 
@@ -109,8 +112,6 @@
   <script lang="ts" setup>
   import { dateUtils } from '@/utils/date';
   import { quizViewModel } from '@/viewmodel/quiz';
-
-  quizViewModel.fetchQuizzes();
 
   </script>
   <route lang="json">

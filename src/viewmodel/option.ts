@@ -1,4 +1,5 @@
 import type { Option } from '@/models/option';
+import type { TableOption } from '@/models/table';
 import { optionService } from '@/services/option';
 import { simulateDelay } from '@/utils/delay';
 import { reactive, ref } from 'vue';
@@ -8,10 +9,10 @@ class OptionViewModel {
 
   editForm = ref<VForm | null>(null);
   readonly headers = [
-    { title: 'Option ID', value: 'id', width: '40%' },
-    { title: 'Option Text', value: 'optionText', width: '40%' },
-    { title: 'Correct', value: 'correct', width: '10%' },
-    { title: 'Actions', value: 'actions', sortable: false, width: '10%' },
+    { title: 'Option ID', key: 'id', sortable: false, width: '40%' },
+    { title: 'Option Text', key: 'optionText',sortable: false, width: '40%' },
+    { title: 'Correct', key: 'correct', sortable: false, width: '10%' },
+    { title: 'Actions', key: 'actions', sortable: false, width: '10%' },
   ];
 
   readonly optionTextRules = [
@@ -21,6 +22,8 @@ class OptionViewModel {
   readonly model = reactive({
     loading: false,
     options: [] as Option[],
+    totalOptions: 0,
+    itemsPerPage: 10,
     editFormValid: false,
     editMode: 'edit' as 'create' | 'edit',
     deleteDialog: {
@@ -35,17 +38,14 @@ class OptionViewModel {
     },
   })
 
-  async fetchOptions () {
+  readonly fetchOptions = async (option: TableOption) => {
     this.model.loading = true;
-    try {
-      await simulateDelay()
-      const options = await optionService.getOptions();
-      this.model.options = options;
-    } catch(error) {
-      console.log('error', error);
-    } finally {
+    await simulateDelay()
+    optionService.getOptions(option).then(options => {
       this.model.loading = false;
-    }
+      this.model.options = options.data;
+      this.model.totalOptions = options.totalElements;
+    })
   }
 
   readonly openDeleteDialog = (option: Option) => {

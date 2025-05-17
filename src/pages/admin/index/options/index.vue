@@ -1,5 +1,5 @@
 <template>
-  <main-content-list :loading="optionViewModel.model.loading" @create="optionViewModel.openCreateDialog()">
+  <main-content-list :loading="false" @create="optionViewModel.openCreateDialog()">
     <template #title>
       Option List
     </template>
@@ -7,12 +7,15 @@
       Create Option
     </template>
     <template #content>
-      <v-data-table
+      <v-data-table-server
+        v-model:items-per-page="optionViewModel.model.itemsPerPage"
         :headers="optionViewModel.headers"
         :items="optionViewModel.model.options"
+        :items-length="optionViewModel.model.totalOptions"
         :loading="optionViewModel.model.loading"
         no-data-text="No options found."
         no-results-text="No matching options found."
+        @update:options="optionViewModel.fetchOptions"
       >
         <template #[`item.correct`]="{ item }">
           <v-icon :color="item.correct ? 'green' : 'red'">
@@ -42,7 +45,7 @@
             </v-btn>
           </div>
         </template>
-      </v-data-table>
+      </v-data-table-server>
     </template>
     <template #dialogs>
       <v-dialog v-model="optionViewModel.model.deleteDialog.show" max-width="500">
@@ -104,7 +107,7 @@
 <script lang="ts" setup>
   import { optionViewModel } from '@/viewmodel/option';
 
-  optionViewModel.fetchOptions();
+  // optionViewModel.fetchOptions();
 
 </script>
 <route lang="json">

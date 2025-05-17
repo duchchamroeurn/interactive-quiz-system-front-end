@@ -1,5 +1,6 @@
 import { ResponseError } from '@/models/error';
 import type { Session } from '@/models/session';
+import type { TableOption } from '@/models/table';
 import router from '@/router';
 import { sessionService } from '@/services/session';
 import { simulateDelay } from '@/utils/delay';
@@ -8,15 +9,17 @@ import type { VForm } from 'vuetify/components';
 
 class SessionViewModel {
   readonly headers = [
-    { title: 'Session ID', value: 'sessionId', width: '30%' },
-    { title: 'Session Code', value: 'sessionCode', width: '20%' },
-    { title: 'Start Time', value: 'startTime', width: '25%' },
-    { title: 'End Time', value: 'endTime', width: '25%' },
-    { title: 'Actions', value: 'actions', sortable: false, width: '10%' },
+    { title: 'Session ID', key: 'sessionId', width: '30%' },
+    { title: 'Session Code', key: 'sessionCode', width: '20%' },
+    { title: 'Start Time', key: 'startTime', width: '25%' },
+    { title: 'End Time', key: 'endTime', width: '25%' },
+    { title: 'Actions', key: 'actions', sortable: false, width: '10%' },
   ];
 
   readonly sessionListModel = reactive({
     loading: false,
+    itemsPerPage: 10,
+    totalSessions: 0,
     sessions: [] as Session[],
   })
   readonly deleteDialog = reactive({
@@ -44,12 +47,13 @@ class SessionViewModel {
   editForm = ref<VForm | null>(null);
   editMode = ref<'create' | 'edit'>('edit');
 
-  async fetchListSession () {
+  readonly fetchListSession = async (option: TableOption) => {
     this.sessionListModel.loading = true;
     try{
       await simulateDelay()
-      const listSession = await sessionService.getSessions();
-      this.sessionListModel.sessions = listSession;
+      const listSession = await sessionService.getSessions(option);
+      this.sessionListModel.sessions = listSession.data;
+      this.sessionListModel.totalSessions = listSession.totalElements;
     } catch (error) {
       if (error instanceof ResponseError) {
         console.log('Errors ', error.errors);

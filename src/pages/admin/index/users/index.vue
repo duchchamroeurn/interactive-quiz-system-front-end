@@ -1,5 +1,5 @@
 <template>
-  <main-content-list :loading="userViewModel.listUserModel.loading" @create="userViewModel.openCreateDialog()">
+  <main-content-list :loading="false" @create="userViewModel.openCreateDialog()">
     <template #title>
       User List
     </template>
@@ -7,12 +7,15 @@
       Create User
     </template>
     <template #content>
-      <v-data-table
+      <v-data-table-server
+        v-model:items-per-page="userViewModel.listUserModel.itemsPerPage"
         :headers="userViewModel.headers"
         :items="userViewModel.listUserModel.users"
+        :items-length="userViewModel.listUserModel.totalUsers"
         :loading="userViewModel.listUserModel.loading"
         no-data-text="No users found."
         no-results-text="No matching users found."
+        @update:options="userViewModel.fetchListUser"
       >
         <template #[`item.userRole`]="{ item }">
           <v-chip
@@ -44,7 +47,7 @@
             </v-btn>
           </div>
         </template>
-      </v-data-table>
+      </v-data-table-server>
     </template>
     <template #dialogs>
       <v-dialog v-model="userViewModel.deleteDialog.show" max-width="500">
@@ -114,7 +117,6 @@
 
 <script lang="ts" setup>
   import { userViewModel } from '@/viewmodel/user';
-  userViewModel.fetchListUser();
 </script>
 <route lang="json">
   {

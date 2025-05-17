@@ -1,17 +1,19 @@
 import { ResponseError } from '@/models/error';
+import type { TableOption } from '@/models/table';
 import { type User, type UserRole, userRoleSchema } from '@/models/user';
 import { userService } from '@/services/user';
+import { simulateDelay } from '@/utils/delay';
 import { reactive, ref } from 'vue';
 import type { VForm } from 'vuetify/components';
 
 class UserViewModel {
   private listUser: User[] = []
   readonly headers = [
-    { title: 'User ID', value: 'userId', width: '30%' },
-    { title: 'Email', value: 'email', width: '25%' },
-    { title: 'Username', value: 'username', width: '20%' },
-    { title: 'Role', value: 'userRole', width: '15%' },
-    { title: 'Actions', value: 'actions', sortable: false, width: '10%' },
+    { title: 'User ID', key: 'userId', width: '30%' },
+    { title: 'Email', key: 'email', width: '25%' },
+    { title: 'Username', key: 'username', width: '20%' },
+    { title: 'Role', key: 'userRole', width: '15%' },
+    { title: 'Actions', key: 'actions', sortable: false, width: '10%' },
   ];
   readonly emailRules = [
     (v: string) => !!v || 'Email is required',
@@ -28,6 +30,8 @@ class UserViewModel {
   readonly userRoles = Object.values(userRoleSchema.Enum)
 
   listUserModel = reactive({
+    itemsPerPage: 10,
+    totalUsers: 0,
     loading: false,
     users: this.listUser,
   })
@@ -50,16 +54,13 @@ class UserViewModel {
     user: {} as User,
   })
 
-  private simulateDelay (ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  async fetchListUser () {
+  readonly fetchListUser = async (option: TableOption) => {
     this.listUserModel.loading = true
     try {
-      await this.simulateDelay(500);
-      const users = await userService.getUsers()
-      this.listUserModel.users = users
+      await simulateDelay();
+      const users = await userService.getUsers(option)
+      this.listUserModel.users = users.data;
+      this.listUserModel.totalUsers = users.totalElements;
     } catch (error) {
       if (error instanceof ResponseError) {
         console.log(error.errors);

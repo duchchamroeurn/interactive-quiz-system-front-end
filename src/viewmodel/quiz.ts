@@ -1,4 +1,5 @@
 import type { Quiz } from '@/models/quiz';
+import type { TableOption } from '@/models/table';
 import router from '@/router';
 import { quizService } from '@/services/quiz';
 import { simulateDelay } from '@/utils/delay';
@@ -10,6 +11,8 @@ class QuizViewModel {
   readonly model = reactive({
     quizzes: [] as Quiz[],
     loading: false,
+    totalQuiz: 0,
+    itemsPerPage: 10,
     deleteDialog: {
       show: false,
       quiz: null as Quiz | null,
@@ -24,20 +27,21 @@ class QuizViewModel {
     editMode: 'edit' as 'create' | 'edit',
   })
   readonly headers = [
-    { title: 'Quiz ID', value: 'id', width: '35%' },
-    { title: 'Title', value: 'title', width: '35%' },
-    { title: 'Created At', value: 'createdAt', width: '15%' },
-    { title: 'Actions', value: 'actions', sortable: false, width: '15%' },
+    { title: 'Quiz ID', key: 'id', width: '35%' },
+    { title: 'Title', key: 'title', width: '35%' },
+    { title: 'Created At', key: 'createdAt', width: '15%' },
+    { title: 'Actions', key: 'actions', sortable: false, width: '15%' },
   ];
 
   editForm = ref<VForm | null>(null);
 
-  async fetchQuizzes () {
+  readonly fetchQuizzes = async (option: TableOption) => {
     this.model.loading = true
     try{
       await simulateDelay()
-      const quizzes = await quizService.getQuizzes();
-      this.model.quizzes = quizzes;
+      const quizzes = await quizService.getQuizzes(option);
+      this.model.quizzes = quizzes.data;
+      this.model.totalQuiz = quizzes.totalElements;
     } catch(error) {
       console.log('error', error)
     } finally {
@@ -88,16 +92,17 @@ class QuizViewModel {
   };
 
   readonly openCreateDialog = () => {
-    this.model.editMode = 'create';
-    this.model.editDialog = {
-      show: true,
-      quiz: {
-        id: '',
-        title: '',
-        createdAt: '',
-      },
-      loading: false,
-    };
+    // this.model.editMode = 'create';
+    // this.model.editDialog = {
+    //   show: true,
+    //   quiz: {
+    //     id: '',
+    //     title: '',
+    //     createdAt: '',
+    //   },
+    //   loading: false,
+    // };
+    router.push('/admin/quizzes/create')
   };
 
   readonly closeEditDialog = () => {

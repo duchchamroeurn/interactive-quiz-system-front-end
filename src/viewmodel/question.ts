@@ -1,4 +1,5 @@
 import type { Question } from '@/models/question';
+import type { TableOption } from '@/models/table';
 import router from '@/router';
 import { questionService } from '@/services/question';
 import { simulateDelay } from '@/utils/delay';
@@ -8,10 +9,10 @@ import type { VForm } from 'vuetify/components';
 class QuestionViewModel {
 
   readonly headers = [
-    { title: 'Question ID', value: 'id', width: '40%' },
-    { title: 'Question Text', value: 'questionText', width: '40%' },
-    { title: 'Time Limit (s)', value: 'time', width: '10%' },
-    { title: 'Actions', value: 'actions', sortable: false, width: '10%' },
+    { title: 'Question ID', key: 'id', width: '40%' },
+    { title: 'Question Text', key: 'questionText', width: '40%' },
+    { title: 'Time Limit (s)', key: 'time', width: '10%' },
+    { title: 'Actions', key: 'actions', sortable: false, width: '10%' },
   ];
 
   readonly questionTextRules = [
@@ -28,6 +29,8 @@ class QuestionViewModel {
   readonly model = reactive({
     loading: false,
     questions: [] as Question[],
+    totalQuestions: 0,
+    itemsPerPage: 10,
     editFormValid: false,
     editMode: 'edit' as 'edit' | 'create',
     editDialog: {
@@ -42,17 +45,17 @@ class QuestionViewModel {
     },
   })
 
-  async fetchQuestions () {
+  get tableLoading (): boolean {
+    return this.model.loading;
+  }
+
+  readonly fetchQuestions = async (option: TableOption) => {
     this.model.loading = true;
-    try {
-      await simulateDelay()
-      const questions = await questionService.getQuestions();
-      this.model.questions = questions
-    }catch(error) {
-      console.log('error', error);
-    } finally {
-      this.model.loading = false;
-    }
+    await simulateDelay();
+    const quesitons = await questionService.getQuestions(option);
+    this.model.loading = false;
+    this.model.questions = quesitons.data;
+    this.model.totalQuestions = quesitons.totalElements;
   }
 
   readonly openDeleteDialog = (question: Question) => {

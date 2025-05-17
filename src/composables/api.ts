@@ -1,5 +1,4 @@
 import { ResponseError } from '@/models/error';
-import { type SuccessResponse, successResponseSchema } from '@/models/success';
 import axios, { AxiosError, type AxiosResponse } from 'axios';
 import { z } from 'zod';
 
@@ -12,13 +11,12 @@ const apiClient = axios.create({
   },
 });
 
-export const apiRequest = async <T, TDataSchema extends z.ZodType<T>>(
+export const apiRequest = async <T, TDataSchema extends z.ZodType>(
   url: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
   dataSchema: TDataSchema,
   data = {}
-): Promise<SuccessResponse<T>> => {
-  const finalApiResponseSchema = successResponseSchema(dataSchema);
+): Promise<T> => {
   try {
     const response: AxiosResponse = await apiClient({
       method,
@@ -27,8 +25,8 @@ export const apiRequest = async <T, TDataSchema extends z.ZodType<T>>(
     });
     console.log('Response = ', response.data)
     //  Parse the entire response using the schema
-    const validatedResponse = finalApiResponseSchema.parse(response.data)
-    return validatedResponse as SuccessResponse<T>
+    const validatedResponse = dataSchema.parse(response.data)
+    return validatedResponse as T
 
   } catch (error: unknown) {
     //  Improved error handling

@@ -1,5 +1,5 @@
 <template>
-  <main-content-list :loading="sessionViewModel.sessionListModel.loading" @create="sessionViewModel.openCreateDialog()">
+  <main-content-list :loading="false" @create="sessionViewModel.openCreateDialog()">
     <template #title>
       Session List
     </template>
@@ -8,11 +8,14 @@
     </template>
     <template #content>
       <v-data-table
+        v-model:items-per-page="sessionViewModel.sessionListModel.itemsPerPage"
         :headers="sessionViewModel.headers"
         :items="sessionViewModel.sessionListModel.sessions"
+        :items-length="sessionViewModel.sessionListModel.totalSessions"
         :loading="sessionViewModel.sessionListModel.loading"
         no-data-text="No sessions found."
         no-results-text="No matching sessions found."
+        @update:options="sessionViewModel.fetchListSession"
       >
         <template #[`item.startTime`]="{ item }">
           {{ dateUtils.formatDate(item.startTime) }}
@@ -143,7 +146,7 @@
 <script lang="ts" setup>
   import { dateUtils } from '@/utils/date';
   import { sessionViewModel } from '@/viewmodel/session';
-  sessionViewModel.fetchListSession()
+
 </script>
 <route lang="json">
   {

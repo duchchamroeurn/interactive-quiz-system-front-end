@@ -26,6 +26,7 @@ declare module 'vue-router/auto-routes' {
     '/admin//questions/[id]': RouteRecordInfo<'/admin//questions/[id]', '/admin/questions/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/admin//quizzes/': RouteRecordInfo<'/admin//quizzes/', '/admin/quizzes', Record<never, never>, Record<never, never>>,
     '/admin//quizzes/[id]': RouteRecordInfo<'/admin//quizzes/[id]', '/admin/quizzes/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
+    '/admin//quizzes/create': RouteRecordInfo<'/admin//quizzes/create', '/admin/quizzes/create', Record<never, never>, Record<never, never>>,
     '/admin//sessions/': RouteRecordInfo<'/admin//sessions/', '/admin/sessions', Record<never, never>, Record<never, never>>,
     '/admin//sessions/[id]': RouteRecordInfo<'/admin//sessions/[id]', '/admin/sessions/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/admin//sessions/[sessionId]/user.[userId]': RouteRecordInfo<'/admin//sessions/[sessionId]/user.[userId]', '/admin/sessions/:sessionId/user/:userId', { sessionId: ParamValue<true>, userId: ParamValue<true> }, { sessionId: ParamValue<false>, userId: ParamValue<false> }>,
