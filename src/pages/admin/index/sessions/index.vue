@@ -1,5 +1,5 @@
 <template>
-  <main-content-list :loading="false" @create="sessionViewModel.openCreateDialog()">
+  <main-content-list :loading="false" @create="sessionViewModel.showCreateSessionDialog">
     <template #title>
       Session List
     </template>
@@ -7,12 +7,12 @@
       Create Session
     </template>
     <template #content>
-      <v-data-table
-        v-model:items-per-page="sessionViewModel.sessionListModel.itemsPerPage"
+      <v-data-table-server
+        v-model:options="sessionViewModel.model.tableOptions"
         :headers="sessionViewModel.headers"
-        :items="sessionViewModel.sessionListModel.sessions"
-        :items-length="sessionViewModel.sessionListModel.totalSessions"
-        :loading="sessionViewModel.sessionListModel.loading"
+        :items="sessionViewModel.model.sessions"
+        :items-length="sessionViewModel.model.totalSessions"
+        :loading="sessionViewModel.model.loading"
         no-data-text="No sessions found."
         no-results-text="No matching sessions found."
         @update:options="sessionViewModel.fetchListSession"
@@ -67,7 +67,7 @@
             </v-btn>
           </div>
         </template>
-      </v-data-table>
+      </v-data-table-server>
     </template>
     <template #dialogs>
 
@@ -107,33 +107,45 @@
         </v-card>
       </v-dialog>
 
-      <v-dialog v-model="sessionViewModel.editDialog.show" max-width="500">
+      <v-dialog v-model="sessionViewModel.model.createSessionDialog.show" max-width="500" persistent>
         <v-card>
           <v-card-title>
-            {{ sessionViewModel.editMode.value === 'create' ? 'Create Session' : 'Edit Session' }}
+            Start New Session
           </v-card-title>
           <v-card-text>
-            <v-form :ref="sessionViewModel.editForm" v-model="sessionViewModel.editFormValid.value">
-              <v-text-field
-                v-model="sessionViewModel.editDialog.session.sessionCode"
-                :disabled="sessionViewModel.editMode.value === 'edit'"
-                label="Session Code"
+            <v-form>
+              <v-autocomplete
+                v-model="sessionViewModel.model.createSessionDialog.selectedQuizId"
+                item-text="title"
+                item-value="value"
+                :items="sessionViewModel.model.createSessionDialog.availableQuizzes"
+                label="Select Quiz"
                 required
-                :rules="sessionViewModel.sessionCodeRules"
-              />
+                :rules="[v => !!v || 'Quiz is required']"
+                @update:search="sessionViewModel.filterQuizzes"
+              >
+                <template #no-data>
+                  <v-list-item>
+                    <v-list-item-title>
+                      No matching quizzes found.
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+
             </v-form>
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn color="grey" @click="sessionViewModel.closeEditDialog">Cancel</v-btn>
+            <v-btn color="grey" @click="sessionViewModel.closeCreateSessionDialog">Cancel</v-btn>
             <v-btn
-              color="blue"
-              :disabled="!sessionViewModel.editFormValid.value"
-              :loading="sessionViewModel.editDialog.loading"
-              @click="sessionViewModel.saveEditSession"
+              color="primary"
+              :disabled="!sessionViewModel.model.createSessionDialog.selectedQuizId"
+              :loading="sessionViewModel.model.createSessionDialog.loading"
+              @click="sessionViewModel.startNewSession"
             >
-              <span v-if="sessionViewModel.editDialog.loading">Saving...</span>
-              <span v-else>Save</span>
+              <span v-if="sessionViewModel.model.createSessionDialog.loading">Starting...</span>
+              <span v-else>Start Session</span>
             </v-btn>
           </v-card-actions>
         </v-card>

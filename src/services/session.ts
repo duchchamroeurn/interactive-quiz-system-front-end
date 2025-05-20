@@ -10,12 +10,15 @@ interface SessionService {
   detailSession: (sessionId: string) => Promise<SessionWithQuizQuestionsOptions>
   getResultSessionBy: (sessionId: string) => Promise<SessionWithParticipant>
   getResultSessionUser: (sessionId: string, userId: string) => Promise<UserQuizResult>
+  startSession: (sessionId: string) => Promise<Session>
+  endSession: (sessionId: string) => Promise<Session>
+  deleteSession: (sessionId: string) => Promise<string>
 }
 
 export const sessionService: SessionService = {
   getSessions: async (option: TableOption): Promise<SuccessPageResponse<Session>> => {
     const validPage = option.page > 0 ? option.page - 1 : 0;
-    const url = 'session?page='+ validPage + '&size=' + option.itemsPerPage;
+    const url = 'session?page=' + validPage + '&size=' + option.itemsPerPage;
     const listUsers = await apiRequest<SuccessPageResponse<Session>, z.ZodType<SuccessPageResponse<Session>>>(url, 'GET', successPageResponseSchema(sessionSchema));
     return listUsers;
   },
@@ -30,8 +33,23 @@ export const sessionService: SessionService = {
     return resultSession.data;
   },
   getResultSessionUser: async (sessionId: string, userId: string): Promise<UserQuizResult> => {
-    const url = 'answer/session/' + sessionId +'/user/' + userId;
+    const url = 'answer/session/' + sessionId + '/user/' + userId;
     const userResult = await apiRequest<SuccessResponse<UserQuizResult>, z.ZodType<SuccessResponse<UserQuizResult>>>(url, 'GET', successResponseSchema(userQuizResultSchema));
     return userResult.data;
+  },
+  startSession: async (sessionId: string): Promise<Session> => {
+    const url = 'session/start/' + sessionId;
+    const result = await apiRequest<SuccessResponse<Session>, z.ZodType<SuccessResponse<Session>>>(url, 'POST', successResponseSchema(sessionSchema));
+    return result.data;
+  },
+  endSession: async (sessionId: string): Promise<Session> => {
+    const url = 'session/end/' + sessionId;
+    const result = await apiRequest<SuccessResponse<Session>, z.ZodType<SuccessResponse<Session>>>(url, 'POST', successResponseSchema(sessionSchema));
+    return result.data;
+  },
+  deleteSession: async (sessionId: string): Promise<string> => {
+    const url = 'session/delete/' + sessionId;
+    const result = await apiRequest<SuccessResponse<string>, z.ZodType<SuccessResponse<string>>>(url, 'POST', successResponseSchema(z.string()));
+    return result.data;
   },
 }

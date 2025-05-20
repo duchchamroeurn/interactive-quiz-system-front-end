@@ -13,6 +13,10 @@ class QuizViewModel {
     loading: false,
     totalQuiz: 0,
     itemsPerPage: 10,
+    tableOptions: {
+      page: 1,
+      itemsPerPage: 10,
+    } as TableOption,
     deleteDialog: {
       show: false,
       quiz: null as Quiz | null,
@@ -36,9 +40,10 @@ class QuizViewModel {
   editForm = ref<VForm | null>(null);
 
   readonly fetchQuizzes = async (option: TableOption) => {
-    this.model.loading = true
-    try{
-      await simulateDelay()
+    this.model.tableOptions = option;
+    this.model.loading = true;
+    try {
+      await simulateDelay();
       const quizzes = await quizService.getQuizzes(option);
       this.model.quizzes = quizzes.data;
       this.model.totalQuiz = quizzes.totalElements;
@@ -67,19 +72,17 @@ class QuizViewModel {
     (v: string) => v.length >= 3 || 'Title must be at least 3 characters',
   ];
 
-  readonly confirmDeleteQuiz = () => {
+  readonly confirmDeleteQuiz = async () => {
     if (!this.model.deleteDialog.quiz) return;
 
     this.model.deleteDialog.loading = true;
-    // Simulate delete API call
-    setTimeout(() => {
-      // In a real application, you would call your delete API here
-      console.log('Deleting quiz:', this.model.deleteDialog.quiz);
-      // Remove the quiz from the list
-      this.model.quizzes = this.model.quizzes!.filter(q => q.id !== this.model.deleteDialog.quiz!.id);
-      this.model.deleteDialog.loading = false;
-      this.closeDeleteDialog();
-    }, 500);
+    const quizId = this.model.deleteDialog.quiz.id;
+    await simulateDelay();
+    await quizService.deleteQuiz(quizId);
+
+    this.model.deleteDialog.loading = false;
+    this.closeDeleteDialog();
+    this.refreshData()
   };
 
   readonly openEditDialog = (quiz: Quiz) => {
@@ -92,18 +95,12 @@ class QuizViewModel {
   };
 
   readonly openCreateDialog = () => {
-    // this.model.editMode = 'create';
-    // this.model.editDialog = {
-    //   show: true,
-    //   quiz: {
-    //     id: '',
-    //     title: '',
-    //     createdAt: '',
-    //   },
-    //   loading: false,
-    // };
     router.push('/admin/quizzes/create')
   };
+
+  private refreshData = () => {
+    this.fetchQuizzes(this.model.tableOptions)
+  }
 
   readonly closeEditDialog = () => {
     this.model.editDialog.show = false;

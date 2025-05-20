@@ -5,16 +5,18 @@ import { type SuccessPageResponse, successPageResponseSchema, type SuccessRespon
 import type { TableOption } from '@/models/table';
 import { z } from 'zod';
 
+type OptionalString = string | null
 interface QuizService {
   getQuizzes: (option: TableOption) => Promise<SuccessPageResponse<Quiz>>
   detailQuiz: (quizId: string) => Promise<QuizWithQuestionsOptions>
   createQuizWithQuestions: (requestBody: QuizRequest) => Promise<Quiz>
+  deleteQuiz: (quizId: string) => Promise<OptionalString>
 }
 
 export const quizService: QuizService = {
   getQuizzes: async (option: TableOption): Promise<SuccessPageResponse<Quiz>> => {
     const validPage = option.page > 0 ? option.page - 1 : 0;
-    const url = 'quiz?page='+ validPage + '&size=' + option.itemsPerPage;
+    const url = 'quiz?page=' + validPage + '&size=' + option.itemsPerPage;
     const listUsers = await apiRequest<SuccessPageResponse<Quiz>, z.ZodType<SuccessPageResponse<Quiz>>>(url, 'GET', successPageResponseSchema(quizSchema));
     return listUsers;
   },
@@ -27,5 +29,10 @@ export const quizService: QuizService = {
     const url = 'quiz/create-with-questions';
     const quizCreate = await apiRequest<SuccessResponse<Quiz>, z.ZodType<SuccessResponse<Quiz>>>(url, 'POST', successResponseSchema(quizSchema), requestBody);
     return quizCreate.data;
+  },
+  deleteQuiz: async (quizId: string): Promise<OptionalString> => {
+    const url = 'quiz/' + quizId;
+    const quizDetail = await apiRequest<SuccessResponse<OptionalString>, z.ZodType<SuccessResponse<OptionalString>>>(url, 'DELETE', successResponseSchema(z.string().nullable()));
+    return quizDetail.data;
   },
 }

@@ -1,7 +1,9 @@
+import type { Dropdown } from '@/models/dropdown';
 import { ResponseError } from '@/models/error';
 import type { Session } from '@/models/session';
 import type { TableOption } from '@/models/table';
 import router from '@/router';
+import { dropdownService } from '@/services/dropdown';
 import { sessionService } from '@/services/session';
 import { simulateDelay } from '@/utils/delay';
 import { reactive, ref } from 'vue';
@@ -16,11 +18,25 @@ class SessionViewModel {
     { title: 'Actions', key: 'actions', sortable: false, width: '10%' },
   ];
 
-  readonly sessionListModel = reactive({
+  private defaultListQuizzes: Dropdown[] = []
+
+  readonly model = reactive({
     loading: false,
     itemsPerPage: 10,
     totalSessions: 0,
+    tableOptions: {
+      page: 1,
+      itemsPerPage: 10,
+    } as TableOption,
     sessions: [] as Session[],
+    createSessionDialog: {
+      show: false,
+      loading: false,
+      selectedQuizId: null as string | null,
+      searchQuiz: '',
+      availableQuizzes: [] as Dropdown[],
+      searchTimeout: undefined as undefined | number,
+    },
   })
   readonly deleteDialog = reactive({
     show: false,
@@ -48,18 +64,19 @@ class SessionViewModel {
   editMode = ref<'create' | 'edit'>('edit');
 
   readonly fetchListSession = async (option: TableOption) => {
-    this.sessionListModel.loading = true;
+    this.model.tableOptions = option
+    this.model.loading = true;
     try{
       await simulateDelay()
       const listSession = await sessionService.getSessions(option);
-      this.sessionListModel.sessions = listSession.data;
-      this.sessionListModel.totalSessions = listSession.totalElements;
+      this.model.sessions = listSession.data;
+      this.model.totalSessions = listSession.totalElements;
     } catch (error) {
       if (error instanceof ResponseError) {
         console.log('Errors ', error.errors);
       }
     } finally {
-      this.sessionListModel.loading = false;
+      this.model.loading = false;
     }
   }
   readonly viewSessionDetail = (session: Session) => {
@@ -80,19 +97,16 @@ class SessionViewModel {
     this.deleteDialog.show = false;
     this.deleteDialog.session = null;
   };
-  readonly confirmDeleteSession = () => {
+  readonly confirmDeleteSession = async () => {
     if (!this.deleteDialog.session) return;
 
     this.deleteDialog.loading = true;
-    // Simulate delete API call
-    setTimeout(() => {
-      // In a real application, you would call your delete API here
-      console.log('Deleting session:', this.deleteDialog.session);
-      // Remove the session from the list
-      this.sessionListModel.sessions = this.sessionListModel.sessions.filter(s => s.sessionId !== this.deleteDialog.session!.sessionId);
-      this.deleteDialog.loading = false;
-      this.closeDeleteDialog();
-    }, 500);
+    const sessionId = this.deleteDialog.session.sessionId;
+    await simulateDelay();
+    await sessionService.deleteSession(sessionId);
+    this.model.sessions = this.model.sessions.filter(s => s.sessionId !== sessionId);
+    this.deleteDialog.loading = false;
+    this.closeDeleteDialog();
   };
 
   readonly openEndSessionDialog = (session: Session) => {
@@ -106,23 +120,68 @@ class SessionViewModel {
     this.endSessionDialog.session = null;
   };
 
-  readonly confirmEndSession = () => {
+  readonly filterQuizzes = (queryText: string) => {
+    clearTimeout(this.model.createSessionDialog.searchTimeout)
+    this.model.createSessionDialog.searchTimeout = setTimeout( async () => {
+      if(queryText.length >= 2) {
+        try {
+          const searchResult = await dropdownService.getQuizzes(queryText);
+          this.model.createSessionDialog.availableQuizzes = searchResult;
+        } catch (error) {
+          console.log('error search quizzes ', error);
+          this.model.createSessionDialog.availableQuizzes = [];
+        }
+      } else {
+        this.model.createSessionDialog.availableQuizzes = this.defaultListQuizzes;
+      }
+    }, 300);
+  };
+
+  readonly confirmEndSession = async () => {
     if (!this.endSessionDialog.session) return;
 
     this.endSessionDialog.loading = true;
-    // Simulate end session API call
-    setTimeout(() => {
-      // In a real application, you would call your end session API here
-      console.log('Ending session:', this.endSessionDialog.session);
-      // Update the session in the list
-      this.sessionListModel.sessions = this.sessionListModel.sessions.map(s =>
-        s.sessionId === this.endSessionDialog.session!.sessionId ? { ...s, endTime: new Date().toISOString() } : s
-      );
-      this.endSessionDialog.loading = false;
-      this.closeEndSessionDialog();
-    }, 500);
+    const sessionId = this.endSessionDialog.session.sessionId;
+    await simulateDelay();
+    const sessionEnded = await sessionService.endSession(sessionId)
+    this.model.sessions = this.model.sessions.map(s => s.sessionId === sessionEnded.sessionId ? { ...s, endTime: sessionEnded.endTime } : s)
+    this.endSessionDialog.loading = false;
+    this.closeEndSessionDialog();
+    this.refreshData()
   };
 
+  readonly loadAvailableQuizzes = async () => {
+    dropdownService.getQuizzes('').then(result => {
+      this.defaultListQuizzes = result;
+      this.model.createSessionDialog.availableQuizzes = result
+    })
+  };
+
+  private refreshData = () => {
+    this.fetchListSession(this.model.tableOptions)
+  }
+
+  readonly showCreateSessionDialog = () => {
+    this.model.createSessionDialog.show = true;
+    // In a real application, fetch the list of quizzes here if not already loaded
+    this.loadAvailableQuizzes();
+  }
+  readonly closeCreateSessionDialog = () => {
+    this.model.createSessionDialog.show = false;
+    this.model.createSessionDialog.selectedQuizId = null;
+    this.model.createSessionDialog.searchQuiz = '';
+  }
+  readonly startNewSession = async () => {
+    if (this.model.createSessionDialog.selectedQuizId) {
+      this.model.createSessionDialog.loading = true;
+      // Simulate starting a session logic
+      await simulateDelay()
+      await sessionService.startSession(this.model.createSessionDialog.selectedQuizId)
+      this.model.createSessionDialog.loading = false;
+      this.closeCreateSessionDialog();
+      this.refreshData()
+    }
+  }
   readonly openCreateDialog = () => {
     this.editMode.value = 'create';
     this.editDialog.session = {
@@ -149,7 +208,7 @@ class SessionViewModel {
       // In a real application, you would call your update API here
       console.log('Saving session:', this.editDialog.session);
       if (this.editMode.value === 'edit') {
-        this.sessionListModel.sessions = this.sessionListModel.sessions.map(s =>
+        this.model.sessions = this.model.sessions.map(s =>
           s.sessionId === this.editDialog.session.sessionId ? { ...this.editDialog.session } : s
         );
       } else {
@@ -159,7 +218,7 @@ class SessionViewModel {
           startTime: new Date().toISOString(),
           endTime: null,
         };
-        this.sessionListModel.sessions.push(newSession);
+        this.model.sessions.push(newSession);
       }
 
       this.editDialog.loading = false;
