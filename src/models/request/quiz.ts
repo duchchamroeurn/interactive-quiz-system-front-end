@@ -1,17 +1,14 @@
-export interface OptionRequest {
-  id: string;
-  text: string;
-  isCorrect: boolean;
-}
-export type QuestionType = 'MULTIPLE_CHOICE' | 'TRUE_FALSE';
+import type { QuestionType } from '@/models/question';
+import type { Option } from '../option';
 
 export interface QuestionRequest {
   id: string;
   type: QuestionType;
   text: string;
   timeLimit: number;
-  options?: OptionRequest[];
+  options?: Option[];
   correctAnswer?: number | null; // For true/false
+  isCustomize: boolean | null;
 }
 
 export interface QuizRequest {

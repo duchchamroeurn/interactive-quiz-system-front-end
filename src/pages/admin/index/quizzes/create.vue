@@ -49,6 +49,7 @@
                     label="Question Type"
                     :model-value="question.type"
                     required
+                    return-object
                     :rules="[createQuizViewModel.rules.required]"
                     @update:model-value="createQuizViewModel.handleQuestionTypeChange($event, questionIndex)"
                   />
@@ -62,7 +63,19 @@
                   />
                   <v-card flat>
                     <v-card-title>
-                      Options
+                      <v-row>
+                        <v-col>Options</v-col>
+                        <v-col v-if="createQuizViewModel.isYesNOOrTrueFalse(question.type)">
+                          <v-switch
+                            v-model:model-value="question.isCustomize"
+                            color="success"
+                            hide-details
+                            inset
+                            :label="`Customize ${question.type.title} Labels`"
+                            @update:model-value="createQuizViewModel.handleLabelCustomizeChange($event, questionIndex)"
+                          />
+                        </v-col>
+                      </v-row>
                     </v-card-title>
                     <v-card-text>
                       <v-card
@@ -74,8 +87,10 @@
                           <v-row>
                             <v-col>
                               <v-text-field
-                                v-model="option.text"
+                                v-model="option.optionText"
+                                :disabled="createQuizViewModel.textfiledYesNoOrTrueFalseState(questionIndex)"
                                 label="Option Text"
+                                :readonly="createQuizViewModel.textfiledYesNoOrTrueFalseState(questionIndex)"
                                 required
                                 :rules="createQuizViewModel.optionRules()"
                               />
@@ -84,15 +99,15 @@
                               <v-row>
                                 <v-col>
                                   <v-checkbox
-                                    v-if="question.type !== 'TRUE_FALSE'"
-                                    v-model="option.isCorrect"
+                                    v-if="createQuizViewModel.isMultitpleChoice(question.type)"
+                                    v-model="option.correct"
                                     class="mr-2"
                                     label="Correct"
-                                    @change="createQuizViewModel.handleCorrectChange(questionIndex, optionIndex)"
+                                    @update:model-value="createQuizViewModel.handleCorrectChange(questionIndex, optionIndex)"
                                   />
-                                  <template v-if="question.type === 'TRUE_FALSE'">
-                                    <v-radio-group v-model="question.correctAnswer" class="mr-2" @change="createQuizViewModel.handleTrueFalseChange(questionIndex)">
-                                      <v-radio :label="option.text" :value="optionIndex" />
+                                  <template v-if="createQuizViewModel.isYesNOOrTrueFalse(question.type)">
+                                    <v-radio-group v-model="question.correctAnswer" class="mr-2" :rules="[createQuizViewModel.rules.selectRquired]" @change="createQuizViewModel.handleTrueFalseChange(questionIndex)">
+                                      <v-radio :label="option.optionText" :value="optionIndex" />
                                     </v-radio-group>
                                   </template>
                                 </v-col>
@@ -159,7 +174,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { createQuizViewModel } from '@/viewmodel/quiz.create';
+  import { CreateQuizViewModel } from '@/viewmodel/quiz.create';
+
+  const createQuizViewModel = new CreateQuizViewModel();
 
 
 </script>
