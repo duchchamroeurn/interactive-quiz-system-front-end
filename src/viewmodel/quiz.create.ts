@@ -2,6 +2,8 @@ import { localStorageService } from '@/composables/store';
 import { defaultOptions, questionTypes } from '@/constants/question';
 import { type QuestionType } from '@/models/question';
 import { type QuizRequest } from '@/models/request/quiz';
+import router from '@/router';
+import { quizService } from '@/services/quiz';
 import { reactive, ref } from 'vue';
 import type { VForm } from 'vuetify/components';
 
@@ -64,11 +66,18 @@ export class CreateQuizViewModel {
     });
   };
 
-  readonly isMultitpleChoice = (questionType: QuestionType): boolean => {
+  readonly isMultitpleChoice = (questionType: QuestionType | string ): boolean => {
+    if (typeof questionType === 'string') {
+      return questionType === 'MULTIPLE_CHOICE';
+    }
     return questionType.type === 'MULTIPLE_CHOICE';
   }
 
-  readonly isYesNOOrTrueFalse = (questionType: QuestionType): boolean => {
+  readonly isYesNOOrTrueFalse = (questionType: QuestionType | string ): boolean => {
+
+    if (typeof questionType === 'string') {
+      return questionType !== 'MULTIPLE_CHOICE';
+    }
     return questionType.type !== 'MULTIPLE_CHOICE';
   }
 
@@ -104,16 +113,19 @@ export class CreateQuizViewModel {
       });
     }
   };
-  readonly handleCorrectChange1 = (option: unknown) => {
-    // console.log(question);
-    console.log(option);
-  }
 
-  readonly handleTrueFalseChange = (questionIndex: number) => {
-    const selectedAnswer = this.quiz.questions[questionIndex].correctAnswer;
+  readonly handleTrueFalseChange = (questionIndex: number, optionIndex: number) => {
+    let correctAnswer: boolean = true;
     this.quiz.questions[questionIndex].options!.forEach((option, index) => {
-      option.correct = index === selectedAnswer;
+      option.correct = index === optionIndex;
+      // The Yes/True answer is in index: 0
+      // The No/False answer is in index: 1
+      if (index === optionIndex) {
+        correctAnswer = index == 0 ? true : false
+      }
     });
+
+    this.quiz.questions[questionIndex].correctAnswer = correctAnswer;
   };
 
   readonly handleQuestionTypeChange = (newValue: QuestionType, questionIndex: number) => {
@@ -124,12 +136,11 @@ export class CreateQuizViewModel {
 
   readonly proceedQuestionTypeChange = (questionIndex: number) => {
     const currentQuestion = this.quiz.questions[questionIndex];
-    const questionType = currentQuestion.type;
+    const questionType = currentQuestion.type as QuestionType;
     this.quiz.questions[questionIndex].options = defaultOptions(questionType.type)
     if (this.isYesNOOrTrueFalse(questionType)) {
-      currentQuestion.correctAnswer = 0;
       currentQuestion.isCustomize = false
-      this.handleTrueFalseChange(questionIndex);
+      this.handleTrueFalseChange(questionIndex, 0);
     } else {
       this.quiz.questions[questionIndex].isCustomize = null;
       this.handleCorrectChange(questionIndex, 0);
@@ -163,23 +174,25 @@ export class CreateQuizViewModel {
         if (this.isYesNOOrTrueFalse(question.type) && !question.isCustomize) {
           const { options, ...questionWithoutOptions } = question;
           console.log(options);
-          return questionWithoutOptions;
+          const questionTypeValue = (question.type as QuestionType).type
+          return { ...questionWithoutOptions, type: questionTypeValue };
         }
-        return question;
+        const questionTypeValue = (question.type as QuestionType).type
+        return { ...question, type: questionTypeValue };
       });
       const newQuiz: QuizRequest = {
         ...this.quiz,
         questions: questionUpdate,
       }
-      console.log('New Quiz = ', newQuiz);
-      // try {
-      //   const result = await quizService.createQuizWithQuestions(newQuiz);
-      //   router.push('/admin/quizzes/' + result.id)
-      // } catch(error) {
-      //   console.log('Error here ', error)
-      // } finally {
-      //   console.log('Happy Ending...')
-      // }
+      // console.log('New Quiz = ', newQuiz);
+      try {
+        const result = await quizService.createQuizWithQuestions(newQuiz);
+        router.push('/admin/quizzes/' + result.id)
+      } catch(error) {
+        console.log('Error here ', error)
+      } finally {
+        console.log('Happy Ending...')
+      }
     }
   };
 

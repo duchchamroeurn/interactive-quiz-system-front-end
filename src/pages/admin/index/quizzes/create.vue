@@ -47,7 +47,7 @@
                   <v-select
                     :items="createQuizViewModel.questionTypes"
                     label="Question Type"
-                    :model-value="question.type"
+                    :model-value="question.type as QuestionType"
                     required
                     return-object
                     :rules="[createQuizViewModel.rules.required]"
@@ -71,7 +71,7 @@
                             color="success"
                             hide-details
                             inset
-                            :label="`Customize ${question.type.title} Labels`"
+                            :label="`Customize ${(question.type as QuestionType).title} Labels`"
                             @update:model-value="createQuizViewModel.handleLabelCustomizeChange($event, questionIndex)"
                           />
                         </v-col>
@@ -106,8 +106,8 @@
                                     @update:model-value="createQuizViewModel.handleCorrectChange(questionIndex, optionIndex)"
                                   />
                                   <template v-if="createQuizViewModel.isYesNOOrTrueFalse(question.type)">
-                                    <v-radio-group v-model="question.correctAnswer" class="mr-2" :rules="[createQuizViewModel.rules.selectRquired]" @change="createQuizViewModel.handleTrueFalseChange(questionIndex)">
-                                      <v-radio :label="option.optionText" :value="optionIndex" />
+                                    <v-radio-group v-model="question.correctAnswer" class="mr-2" :rules="[createQuizViewModel.rules.selectRquired]" @change="createQuizViewModel.handleTrueFalseChange(questionIndex, optionIndex)">
+                                      <v-radio :label="option.optionText" :value="optionIndex === 0" />
                                     </v-radio-group>
                                   </template>
                                 </v-col>
@@ -174,6 +174,7 @@
 </template>
 
 <script lang="ts" setup>
+  import type { QuestionType } from '@/models/question';
   import { CreateQuizViewModel } from '@/viewmodel/quiz.create';
 
   const createQuizViewModel = new CreateQuizViewModel();
