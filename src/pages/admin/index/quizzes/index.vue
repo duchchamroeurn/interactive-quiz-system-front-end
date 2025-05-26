@@ -118,7 +118,8 @@
     {
     "meta": {
     "title": "Quizzes",
-    "requiresAuth": true
+    "requiresAuth": true,
+    "isAdmin": true
     }
     }
   </route>

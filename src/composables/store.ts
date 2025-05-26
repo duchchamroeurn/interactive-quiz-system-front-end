@@ -21,11 +21,14 @@ export const useLocalStorage = () => {
 
   const isAuthenticated = !!getUser()
 
+  const isAdmin = getUser()?.userRole !== 'AUDIENCE'
+
   return {
     saveUser,
     getUser,
     signOut,
     isAuthenticated,
+    isAdmin,
   }
 }
 

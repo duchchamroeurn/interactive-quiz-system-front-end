@@ -71,7 +71,7 @@
                       </template>
                       <v-list-item
                         v-for="(option, i) in question.options"
-                        :key="option.id"
+                        :key="option.id!"
                         :active="option.correct"
                         color="success"
                         :title="`${i + 1}. `+ option.optionText"
@@ -100,7 +100,8 @@
   {
     "meta": {
       "title": "Sessions Details",
-      "requiresAuth": true
+      "requiresAuth": true,
+      "isAdmin": true
     }
   }
   </route>

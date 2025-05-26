@@ -78,13 +78,13 @@
                         </v-list-item-title>
                         <v-list-item
                           v-for="(option, i) in question.options"
-                          :key="option.id"
-                          :active="sessionResultUserViewModel.isUserAnswer(question.id, option.id)"
+                          :key="option.id!"
+                          :active="sessionResultUserViewModel.isUserAnswer(question.id, option.id!)"
                           :color="option.correct ? 'success': 'error'"
                           rounded
                         >
                           <v-list-item-title>{{ i + 1 }}. {{ option.optionText }}<span v-if="option.correct" class="font-weight-bold"> (Correct) </span></v-list-item-title>
-                          <template v-if="sessionResultUserViewModel.isUserAnswer(question.id, option.id)" #append>
+                          <template v-if="sessionResultUserViewModel.isUserAnswer(question.id, option.id!)" #append>
                             <v-icon :color="option.correct ? 'success' : 'error'">
                               {{ option.correct ? 'mdi-check-circle' : 'mdi-close-circle' }}
                             </v-icon>
@@ -131,7 +131,8 @@
   {
     "meta": {
       "title": "User Session Details",
-      "requiresAuth": true
+      "requiresAuth": true,
+      "isAdmin": true
     }
   }
   </route>

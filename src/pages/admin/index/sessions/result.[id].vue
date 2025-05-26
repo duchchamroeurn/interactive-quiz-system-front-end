@@ -78,7 +78,8 @@
   {
     "meta": {
       "title": "Sessions Results",
-      "requiresAuth": true
+      "requiresAuth": true,
+      "isAdmin": true
     }
   }
 </route>

@@ -30,6 +30,7 @@ class SessionDetailViewModel {
       return [
         { label: 'Quiz ID', value: session.quiz.id },
         { label: 'Title', value: session.quiz.title },
+        { label: 'Description', value: session.quiz.description },
         { label: 'Created At', value: dateUtils.formatDate(session.quiz.createdAt) }]
     }
     return []

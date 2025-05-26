@@ -185,7 +185,8 @@
   {
     "meta": {
       "title": "Create Quiz",
-      "requiresAuth": true
+      "requiresAuth": true,
+      "isAdmin": true
     }
   }
 </route>

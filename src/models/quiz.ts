@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const quizSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
+  description: z.string().nullable(),
   createdAt: z.string(),
 })
 

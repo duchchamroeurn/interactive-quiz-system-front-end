@@ -29,7 +29,7 @@
                       <v-list>
                         <v-list-item
                           v-for="(option, i) in questionDetailViewModel.model.questionDetail.options"
-                          :key="option.id"
+                          :key="option.id!"
                           :active="option.correct"
                           color="success"
                           :title="`${i + 1}. `+ option.optionText"
@@ -64,7 +64,8 @@
   {
     "meta": {
       "title": "Question Details",
-      "requiresAuth": true
+      "requiresAuth": true,
+      "isAdmin": true
     }
   }
 </route>

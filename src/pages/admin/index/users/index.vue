@@ -122,7 +122,8 @@
   {
     "meta": {
       "title": "Users",
-      "requiresAuth": true
+      "requiresAuth": true,
+      "isAdmin": true
     }
   }
   </route>

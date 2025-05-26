@@ -15,6 +15,7 @@ class QuizDetailViewModel {
       return [
         { label: 'Quiz ID', value: quizDetail.id },
         { label: 'Title', value: quizDetail.title },
+        { label: 'Description', value: quizDetail.description },
         { label: 'Created At', value: dateUtils.formatDate(quizDetail.createdAt) },
       ]
     }

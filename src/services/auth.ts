@@ -1,4 +1,5 @@
 import { apiRequest } from '@/composables/api';
+import { type SuccessResponse, successResponseSchema } from '@/models/success';
 import { type User, userSchema } from '@/models/user';
 import type { z } from 'zod';
 export interface AuthService {
@@ -8,7 +9,7 @@ export interface AuthService {
 }
 export const authService: AuthService = {
   signIn: async (email: string, pwd: string): Promise<User> => {
-    const auth = await apiRequest<User, z.ZodType<User>>('auth/sign-in', 'POST', userSchema, {
+    const auth = await apiRequest<SuccessResponse<User>, z.ZodType<SuccessResponse<User>>>('auth/sign-in', 'POST', successResponseSchema(userSchema), {
       username: email,
       password: pwd,
     })
