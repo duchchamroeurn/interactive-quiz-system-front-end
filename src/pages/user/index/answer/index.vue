@@ -373,3 +373,10 @@
   min-width: 120px; /* Give buttons a consistent width */
 }
 </style>
+<route lang="json">{
+  "meta": {
+    "title": "Submit Answers",
+    "requiresAuth": true,
+    "isAdmin": false
+  }
+}</route>

@@ -22,7 +22,6 @@ declare module 'vue-router/auto-routes' {
     '/[...path]': RouteRecordInfo<'/[...path]', '/:path(.*)', { path: ParamValue<true> }, { path: ParamValue<false> }>,
     '/admin/': RouteRecordInfo<'/admin/', '/admin', Record<never, never>, Record<never, never>>,
     '/admin//': RouteRecordInfo<'/admin//', '/admin', Record<never, never>, Record<never, never>>,
-    '/admin//answers/': RouteRecordInfo<'/admin//answers/', '/admin/answers', Record<never, never>, Record<never, never>>,
     '/admin//options/': RouteRecordInfo<'/admin//options/', '/admin/options', Record<never, never>, Record<never, never>>,
     '/admin//questions/': RouteRecordInfo<'/admin//questions/', '/admin/questions', Record<never, never>, Record<never, never>>,
     '/admin//questions/[id]': RouteRecordInfo<'/admin//questions/[id]', '/admin/questions/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
@@ -35,6 +34,8 @@ declare module 'vue-router/auto-routes' {
     '/admin//sessions/result.[id]': RouteRecordInfo<'/admin//sessions/result.[id]', '/admin/sessions/result/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/admin//users/': RouteRecordInfo<'/admin//users/', '/admin/users', Record<never, never>, Record<never, never>>,
     '/auth/login': RouteRecordInfo<'/auth/login', '/auth/login', Record<never, never>, Record<never, never>>,
-    '/home/': RouteRecordInfo<'/home/', '/home', Record<never, never>, Record<never, never>>,
+    '/user/': RouteRecordInfo<'/user/', '/user', Record<never, never>, Record<never, never>>,
+    '/user//': RouteRecordInfo<'/user//', '/user', Record<never, never>, Record<never, never>>,
+    '/user//answer/': RouteRecordInfo<'/user//answer/', '/user/answer', Record<never, never>, Record<never, never>>,
   }
 }

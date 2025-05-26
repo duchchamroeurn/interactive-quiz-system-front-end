@@ -3,25 +3,47 @@ import type { NavigationGuardWithThis } from 'vue-router';
 
 const APP_NAME: string = import.meta.env.VITE_APP_NAME;
 const homeAdmin = '/admin';
-const homeUser = '/home'
+const homeUser = '/user'
 const login = '/auth/login';
-const isAuthenticated = useLocalStorage().isAuthenticated;
-const isAdmin = useLocalStorage().isAdmin;
 
 export const guard: NavigationGuardWithThis<undefined> = function (this: undefined, to, from, next) {
   document.title = to.meta.title + ' | ' + APP_NAME
-  if (to.meta.requiresAuth && ! isAuthenticated) {
-    next(login)
-  } else if(to.meta.requiresAuth == false && isAuthenticated) {
-    if (to.meta.isAdmin === true && isAdmin) {
-      next(homeAdmin)
+
+  // Retrieve authentication and admin status
+  const { isAuthenticated, isAdmin } = useLocalStorage();
+
+  const requiredAuth = to.meta.requiresAuth === true;
+  const requiredAdmin = to.meta.isAdmin === true;
+
+  const adminAuthenticated = isAuthenticated && isAdmin;
+  const routeRequiredAdmin = requiredAuth && requiredAdmin;
+
+  //check if authentication
+  if(requiredAuth && isAuthenticated) {
+    if(routeRequiredAdmin && !adminAuthenticated) {
+      next(homeUser);
+    } else if (!routeRequiredAdmin && adminAuthenticated) {
+      next(homeAdmin);
     } else {
-      next(homeUser)
+      next();
     }
-  } else if(to.meta.isAdmin == true && !isAdmin) {
-    next(login)
   }
-  else {
-    next();
+
+  if(requiredAuth && !isAuthenticated) {
+    next(login);
   }
+
+  if(!requiredAuth && isAuthenticated) {
+    if(to.meta.requiresAuth === false) {
+      if(adminAuthenticated) {
+        next(homeAdmin);
+      } else {
+        next(homeUser);
+      }
+    } else {
+      next();
+    }
+  }
+
+  next();
 };
