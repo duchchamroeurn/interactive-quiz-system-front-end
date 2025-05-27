@@ -1,92 +1,96 @@
 <template>
-  <v-container>
-    <v-card v-if="quizSession" class="pa-6" elevation="8">
-      <v-card-title class="text-h4 text-center mb-4">{{ quizSession.quiz.title }}</v-card-title>
-      <v-card-subtitle class="text-center text-body-1 mb-4">{{ quizSession.quiz.description }}</v-card-subtitle>
+  <v-container class="py-8">
+    <v-row justify="center">
+      <v-col cols="12" md="8">
+        <v-card v-if="quizSession" class="pa-6 mb-8">
+          <v-card-title class="text-h4 text-center mb-4">{{ quizSession.quiz.title }}</v-card-title>
+          <v-card-subtitle class="text-center text-body-1 mb-4">{{ quizSession.quiz.description }}</v-card-subtitle>
 
-      <v-divider class="my-4" />
+          <v-divider class="my-4" />
 
-      <div class="d-flex justify-center align-center mb-6">
-        <v-icon class="mr-2" color="info">mdi-timer</v-icon>
-        <span class="text-h5 text-info font-weight-bold">Time Left: {{ formattedTimeLeft }}</span>
-      </div>
+          <div class="d-flex justify-center align-center mb-6">
+            <v-icon class="mr-2" color="info">mdi-timer</v-icon>
+            <span class="text-h5 text-info font-weight-bold">Time Left: {{ formattedTimeLeft }}</span>
+          </div>
 
-      <v-card class="pa-4 mb-6" outlined>
-        <v-card-title class="text-h5 primary--text">
-          Question {{ currentQuestionIndex + 1 }} / {{ quizSession.quiz.questions.length }}
-        </v-card-title>
-        <v-card-subtitle class="text-body-1 mb-3">
-          {{ currentQuestion?.questionText }}
-        </v-card-subtitle>
+          <v-card class="pa-4 mb-6" flat>
+            <v-card-title class="text-h5 primary--text">
+              Question {{ currentQuestionIndex + 1 }} / {{ quizSession.quiz.questions.length }}
+            </v-card-title>
+            <v-card-subtitle class="text-body-1 mb-3">
+              {{ currentQuestion?.questionText }}
+            </v-card-subtitle>
 
-        <v-card-text>
-          <div v-if="currentQuestion?.type === 'MULTIPLE_CHOICE'">
-            <v-checkbox
-              v-for="option in currentQuestion.options"
-              :key="option.id"
-              v-model="userAnswers[currentQuestion.id]"
+            <v-card-text>
+              <div v-if="currentQuestion?.type === 'MULTIPLE_CHOICE'">
+                <v-checkbox
+                  v-for="option in currentQuestion.options"
+                  :key="option.id"
+                  v-model="userAnswers[currentQuestion.id]"
+                  color="primary"
+                  hide-details
+                  :label="option.optionText"
+                  :value="option.id"
+                />
+              </div>
+
+              <div v-else-if="currentQuestion?.type === 'TRUE_FALSE' || currentQuestion?.type === 'YES_NO'">
+                <v-radio-group v-model="userAnswers[currentQuestion.id]" hide-details>
+                  <v-radio
+                    v-for="option in currentQuestion.options"
+                    :key="option.id"
+                    color="primary"
+                    :label="option.optionText"
+                    :value="option.id"
+                  />
+                </v-radio-group>
+              </div>
+
+              <div v-else-if="currentQuestion?.type === 'SHORT_ANSWER'">
+                <v-textarea
+                  v-model="userAnswers[currentQuestion.id]"
+                  label="Your Answer"
+                  outlined
+                  rows="3"
+                />
+              </div>
+            </v-card-text>
+          </v-card>
+
+          <v-card-actions class="d-flex justify-space-between mt-4">
+            <v-btn
+              color="secondary"
+              :disabled="currentQuestionIndex === 0"
+              prepend-icon="mdi-arrow-left"
+              @click="prevQuestion"
+            >
+              Previous
+            </v-btn>
+            <v-btn
+              v-if="currentQuestionIndex < quizSession.quiz.questions.length - 1"
+              append-icon="mdi-arrow-right"
               color="primary"
-              hide-details
-              :label="option.optionText"
-              :value="option.id"
-            />
-          </div>
+              @click="nextQuestion"
+            >
+              Next
+            </v-btn>
+            <v-btn
+              v-else
+              color="success"
+              prepend-icon="mdi-check-all"
+              @click="submitQuiz"
+            >
+              Submit Quiz
+            </v-btn>
+          </v-card-actions>
+        </v-card>
 
-          <div v-else-if="currentQuestion?.type === 'TRUE_FALSE' || currentQuestion?.type === 'YES_NO'">
-            <v-radio-group v-model="userAnswers[currentQuestion.id]" hide-details>
-              <v-radio
-                v-for="option in currentQuestion.options"
-                :key="option.id"
-                color="primary"
-                :label="option.optionText"
-                :value="option.id"
-              />
-            </v-radio-group>
-          </div>
-
-          <div v-else-if="currentQuestion?.type === 'SHORT_ANSWER'">
-            <v-textarea
-              v-model="userAnswers[currentQuestion.id]"
-              label="Your Answer"
-              outlined
-              rows="3"
-            />
-          </div>
-        </v-card-text>
-      </v-card>
-
-      <v-card-actions class="d-flex justify-space-between mt-4">
-        <v-btn
-          color="secondary"
-          :disabled="currentQuestionIndex === 0"
-          prepend-icon="mdi-arrow-left"
-          @click="prevQuestion"
-        >
-          Previous
-        </v-btn>
-        <v-btn
-          v-if="currentQuestionIndex < quizSession.quiz.questions.length - 1"
-          append-icon="mdi-arrow-right"
-          color="primary"
-          @click="nextQuestion"
-        >
-          Next
-        </v-btn>
-        <v-btn
-          v-else
-          color="success"
-          prepend-icon="mdi-check-all"
-          @click="submitQuiz"
-        >
-          Submit Quiz
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-
-    <v-card v-else class="pa-6 text-center" elevation="8">
-      <v-progress-circular color="primary" indeterminate size="64" />
-      <p class="mt-4 text-h6">Loading Quiz Session...</p>
-    </v-card>
+        <v-card v-else class="pa-6 text-center">
+          <v-progress-circular color="primary" indeterminate size="64" />
+          <p class="mt-4 text-h6">Loading Quiz Session...</p>
+        </v-card>
+      </v-col>
+    </v-row>
 
     <v-dialog v-model="quizEndedDialog" max-width="500" persistent>
       <v-card>
@@ -355,28 +359,12 @@
   });
 </script>
 
-<style scoped>
-/* Scoped styles */
-.v-card-title.text-h4 {
-  color: #1a237e; /* Deep blue */
-}
-
-.v-card-subtitle.text-body-1 {
-  color: #424242;
-}
-
-.primary--text {
-  color: #1976d2 !important; /* Vuetify default primary blue */
-}
-
-.v-card-actions .v-btn {
-  min-width: 120px; /* Give buttons a consistent width */
-}
-</style>
-<route lang="json">{
+<route lang="json">
+{
   "meta": {
     "title": "Submit Answers",
     "requiresAuth": true,
     "isAdmin": false
   }
-}</route>
+}
+</route>
