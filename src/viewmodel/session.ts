@@ -1,5 +1,6 @@
 import type { Dropdown } from '@/models/dropdown';
 import { ResponseError } from '@/models/error';
+import type { CreateSessionRequest } from '@/models/request/create.session';
 import type { Session } from '@/models/session';
 import type { TableOption } from '@/models/table';
 import router from '@/router';
@@ -19,6 +20,7 @@ class SessionViewModel {
   ];
 
   private defaultListQuizzes: Dropdown[] = []
+  private defaultListUsers: Dropdown[] = []
 
   readonly model = reactive({
     loading: false,
@@ -33,9 +35,11 @@ class SessionViewModel {
       show: false,
       loading: false,
       selectedQuizId: null as string | null,
-      searchQuiz: '',
       availableQuizzes: [] as Dropdown[],
       searchTimeout: undefined as undefined | number,
+      isPrivateSession: false,
+      selectedUsersIds: [] as string[],
+      availableUsers: [] as Dropdown[],
     },
   })
   readonly deleteDialog = reactive({
@@ -137,6 +141,23 @@ class SessionViewModel {
     }, 300);
   };
 
+  readonly filterUsers = (queryText: string) => {
+    clearTimeout(this.model.createSessionDialog.searchTimeout)
+    this.model.createSessionDialog.searchTimeout = setTimeout( async () => {
+      if(queryText.length >= 2) {
+        try {
+          const searchResult = await dropdownService.getAudiences(queryText);
+          this.model.createSessionDialog.availableUsers = searchResult;
+        } catch (error) {
+          console.log('error search users ', error);
+          this.model.createSessionDialog.availableUsers = [];
+        }
+      } else {
+        this.model.createSessionDialog.availableUsers = this.defaultListUsers;
+      }
+    }, 300);
+  };
+
   readonly confirmEndSession = async () => {
     if (!this.endSessionDialog.session) return;
 
@@ -157,6 +178,13 @@ class SessionViewModel {
     })
   };
 
+  readonly loadAvailableUsers = async () => {
+    dropdownService.getAudiences('').then(result => {
+      this.defaultListUsers = result;
+      this.model.createSessionDialog.availableUsers = result
+    })
+  };
+
   private refreshData = () => {
     this.fetchListSession(this.model.tableOptions)
   }
@@ -169,14 +197,25 @@ class SessionViewModel {
   readonly closeCreateSessionDialog = () => {
     this.model.createSessionDialog.show = false;
     this.model.createSessionDialog.selectedQuizId = null;
-    this.model.createSessionDialog.searchQuiz = '';
+    this.model.createSessionDialog.isPrivateSession = false;
+    this.model.createSessionDialog.selectedUsersIds = [];
   }
   readonly startNewSession = async () => {
     if (this.model.createSessionDialog.selectedQuizId) {
       this.model.createSessionDialog.loading = true;
       // Simulate starting a session logic
-      await simulateDelay()
-      await sessionService.startSession(this.model.createSessionDialog.selectedQuizId)
+      const requestBody: CreateSessionRequest = {
+        quizId: this.model.createSessionDialog.selectedQuizId,
+        users: this.model.createSessionDialog.selectedUsersIds,
+      };
+      await simulateDelay();
+      await sessionService.startSession(requestBody);
+      const data = {
+        quizId: this.model.createSessionDialog.selectedQuizId,
+        quizAccess: this.model.createSessionDialog.isPrivateSession,
+        users: this.model.createSessionDialog.selectedUsersIds,
+      }
+      console.log('session data: ', data);
       this.model.createSessionDialog.loading = false;
       this.closeCreateSessionDialog();
       this.refreshData()
@@ -198,6 +237,14 @@ class SessionViewModel {
     this.editDialog.show = false;
     this.editDialog.session = {} as Session;
   };
+
+  readonly handleSessionAccessChange = (value: boolean) => {
+    if(value && this.defaultListUsers.length == 0) {
+      this.loadAvailableUsers()
+    } else {
+      this.model.createSessionDialog.selectedUsersIds = [];
+    }
+  }
 
   readonly saveEditSession = () => {
     if (!this.editForm.value?.validate()) return;
