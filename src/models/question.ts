@@ -5,6 +5,9 @@ export const questionSchema = z.object({
   id: z.string().uuid(),
   questionText: z.string(),
   time: z.number(),
+  type: z.string(),
+  customize: z.boolean(),
+  correctAnswer: z.boolean().nullable(),
 })
 
 export type Question = z.infer<typeof questionSchema>

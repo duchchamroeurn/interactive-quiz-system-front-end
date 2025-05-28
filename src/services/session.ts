@@ -1,7 +1,7 @@
 import { apiRequest } from '@/composables/api';
 import type { CreateSessionRequest } from '@/models/request/create.session';
 import { type UserQuizResult, userQuizResultSchema } from '@/models/result';
-import { type Session, sessionSchema, type SessionWithParticipant, sessionWithParticipantSchema, type SessionWithQuizQuestionsOptions, sessionWithQuizQuestionsOptionsSchema } from '@/models/session';
+import { type Session, sessionSchema, type SessionWithParticipant, sessionWithParticipantSchema, type SessionWithQuiz, type SessionWithQuizQuestionsOptions, sessionWithQuizQuestionsOptionsSchema, sessionWithQuizSchema } from '@/models/session';
 import { type SuccessPageResponse, successPageResponseSchema, type SuccessResponse, successResponseSchema } from '@/models/success';
 import type { TableOption } from '@/models/table';
 import { z } from 'zod';
@@ -14,6 +14,7 @@ interface SessionService {
   startSession: (requestBod: CreateSessionRequest) => Promise<Session>
   endSession: (sessionId: string) => Promise<Session>
   deleteSession: (sessionId: string) => Promise<string>
+  getAvailableQuizByUser: (userId: string) => Promise<SuccessPageResponse<SessionWithQuiz>>
 }
 
 export const sessionService: SessionService = {
@@ -52,5 +53,10 @@ export const sessionService: SessionService = {
     const url = 'session/delete/' + sessionId;
     const result = await apiRequest<SuccessResponse<string>, z.ZodType<SuccessResponse<string>>>(url, 'POST', successResponseSchema(z.string()));
     return result.data;
+  },
+  getAvailableQuizByUser: async (userId: string): Promise<SuccessPageResponse<SessionWithQuiz>> => {
+    const url = 'user/'+ userId +'/quizzes/available';
+    const listQuizzes = await apiRequest<SuccessPageResponse<SessionWithQuiz>, z.ZodType<SuccessPageResponse<SessionWithQuiz>>>(url, 'GET', successPageResponseSchema(sessionWithQuizSchema));
+    return listQuizzes;
   },
 }

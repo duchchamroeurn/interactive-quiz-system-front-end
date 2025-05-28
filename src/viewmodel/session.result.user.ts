@@ -58,32 +58,38 @@ class SessionResultUserViewModel {
   }
 
   readonly isUserAnswer = (questionId: string, optionId: string): boolean => {
+    if(!this.model.sesionResult) return false;
     const answer = this.model.sesionResult?.answers.find(a => a.questionId === questionId);
     if (!answer) return false;
 
-    if (Array.isArray(answer.answerId)) {
-      return (answer.answerId as string[]).includes(optionId);
+    const question = this.model.sesionResult.quiz.questions.find(q => q.id === questionId);
+    if (!question) return false;
+
+    if(question.type == 'MULTIPLE_CHOICE' || question.customize) {
+      return answer.answerId === optionId;
     }
-    return answer.answerId === optionId;
+
+    const option = question.options.find(opt => opt.id === optionId)
+
+    return String(option?.correct) == answer.answerId
   };
 
   readonly getUserAnswerText = (questionId: string): string => {
     if(!this.model.sesionResult) return 'Not answered';
-    const answer = this.model.sesionResult.answers.find(a => a.questionId === questionId);
-    if (!answer) return 'Not answered';
 
     const question = this.model.sesionResult.quiz.questions.find(q => q.id === questionId);
     if (!question) return 'Question not found';
 
-    if (Array.isArray(answer.answerId)) {
-      return question.options
-        .filter(opt => (answer.answerId as string[]).includes(opt.id))
-        .map(opt => opt.optionText)
-        .join(', ');
+    const answer = this.model.sesionResult.answers.find(a => a.questionId === questionId);
+    if (!answer) return 'Not answered';
+
+    if(question.type == 'MULTIPLE_CHOICE' || question.customize) {
+      const selectedOption = question.options.find(opt => opt.id === answer.answerId);
+      return selectedOption ? selectedOption.optionText : 'Not answered';
     }
 
-    const selectedOption = question.options.find(opt => opt.id === answer.answerId);
-    return selectedOption ? selectedOption.optionText : 'Not answered';
+    const answerIndex = (answer.answerId as string).toLowerCase() === 'true' ? 0 : 1
+    return question.options[answerIndex].optionText;
   };
 
 }

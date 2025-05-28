@@ -24,8 +24,6 @@ export const guard: NavigationGuardWithThis<undefined> = function (this: undefin
       next(homeUser);
     } else if (!routeRequiredAdmin && adminAuthenticated) {
       next(homeAdmin);
-    } else {
-      next();
     }
   }
 
@@ -40,10 +38,7 @@ export const guard: NavigationGuardWithThis<undefined> = function (this: undefin
       } else {
         next(homeUser);
       }
-    } else {
-      next();
     }
   }
-
-  next();
+  next()
 };

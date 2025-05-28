@@ -9,7 +9,6 @@
         <template #activator="{ props }">
           <v-list v-bind="props">
             <v-list-item
-              :append-icon="mdi-account-circle"
               :title="userName"
             >
               <template #prepend>

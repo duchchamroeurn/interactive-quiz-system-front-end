@@ -1,3 +1,4 @@
+import { ResponseError } from '@/models/error';
 import type { Question } from '@/models/question';
 import type { TableOption } from '@/models/table';
 import router from '@/router';
@@ -52,10 +53,16 @@ class QuestionViewModel {
   readonly fetchQuestions = async (option: TableOption) => {
     this.model.loading = true;
     await simulateDelay();
-    const quesitons = await questionService.getQuestions(option);
-    this.model.loading = false;
-    this.model.questions = quesitons.data;
-    this.model.totalQuestions = quesitons.totalElements;
+    try {
+      const quesitons = await questionService.getQuestions(option);
+      this.model.loading = false;
+      this.model.questions = quesitons.data;
+      this.model.totalQuestions = quesitons.totalElements;
+    } catch(error) {
+      if(error instanceof ResponseError) {
+        console.log(error.stack);
+      }
+    }
   }
 
   readonly openDeleteDialog = (question: Question) => {
