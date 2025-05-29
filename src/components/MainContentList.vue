@@ -16,11 +16,9 @@
           <v-card-title>
             <v-row>
               <v-col>
-                <slot name="title">
-                  <h1>Title</h1>
-                </slot>
+                <slot name="title" />
               </v-col>
-              <v-col class="text-right">
+              <v-col v-if="$slots.action" class="text-right">
                 <v-btn
                   class="ml-4"
                   color="primary"
@@ -41,14 +39,12 @@
       <v-col>
         <v-card variant="elevated">
           <v-card-text>
-            <slot name="content">
-              <p>Text Content</p>
-            </slot>
+            <slot name="content" />
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
-    <slot name="dialogs"><p>Dialog</p></slot>
+    <slot name="dialogs" />
   </v-container>
 </template>
 <script lang="ts" setup>
