@@ -81,7 +81,7 @@
               <v-card-title class="text-h5 primary--text">
                 Question {{ userAnswerController.model.currentQuestionIndex + 1 }} / {{ userAnswerController.model.quizSession!.quiz.questions.length }}
               </v-card-title>
-              <v-card-subtitle class="text-body-1 mb-3">
+              <v-card-subtitle class="text-body-1 mb-3 text-wrap">
                 {{ userAnswerController.currentQuestion.value?.questionText }}
               </v-card-subtitle>
 
