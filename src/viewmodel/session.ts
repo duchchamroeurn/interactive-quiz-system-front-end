@@ -12,11 +12,10 @@ import type { VForm } from 'vuetify/components';
 
 class SessionViewModel {
   readonly headers = [
-    { title: 'Session ID', key: 'sessionId', width: '30%' },
-    { title: 'Session Code', key: 'sessionCode', width: '20%' },
-    { title: 'Start Time', key: 'startTime', width: '25%' },
-    { title: 'End Time', key: 'endTime', width: '25%' },
-    { title: 'Actions', key: 'actions', sortable: false, width: '10%' },
+    { title: 'Session Code', key: 'sessionCode', sortable: false },
+    { title: 'Start Time', key: 'startTime', sortable: false },
+    { title: 'End Time', key: 'endTime', sortable: false },
+    { title: 'Actions', key: 'actions', sortable: false },
   ];
 
   private defaultListQuizzes: Dropdown[] = []

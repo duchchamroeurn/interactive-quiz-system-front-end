@@ -9,10 +9,9 @@ import { reactive } from 'vue';
 class QuestionViewModel {
 
   readonly headers = [
-    { title: 'Question ID', key: 'id', width: '40%' },
-    { title: 'Question Text', key: 'questionText', width: '40%' },
-    { title: 'Time Limit (s)', key: 'time', width: '10%' },
-    { title: 'Actions', key: 'actions', sortable: false, width: '10%' },
+    { title: 'Question Text', key: 'questionText', sortable: false },
+    { title: 'Time Limit (s)', key: 'time', sortable: false },
+    { title: 'Actions', key: 'actions', sortable: false },
   ];
 
   readonly model = reactive({

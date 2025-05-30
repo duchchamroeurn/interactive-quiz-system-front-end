@@ -9,11 +9,10 @@ import type { VForm } from 'vuetify/components';
 class UserViewModel {
   private listUser: User[] = []
   readonly headers = [
-    { title: 'User ID', key: 'userId', width: '30%' },
-    { title: 'Email', key: 'email', width: '25%' },
-    { title: 'Username', key: 'username', width: '20%' },
-    { title: 'Role', key: 'userRole', width: '15%' },
-    { title: 'Actions', key: 'actions', sortable: false, width: '10%' },
+    { title: 'Username', key: 'username', sortable: false },
+    { title: 'Email', key: 'email', sortable: false },
+    { title: 'Role', key: 'userRole', sortable: false },
+    { title: 'Actions', key: 'actions', sortable: false },
   ];
   readonly emailRules = [
     (v: string) => !!v || 'Email is required',

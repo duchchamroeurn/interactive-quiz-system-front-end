@@ -31,10 +31,9 @@ class QuizViewModel {
     editMode: 'edit' as 'create' | 'edit',
   })
   readonly headers = [
-    { title: 'Quiz ID', key: 'id', width: '35%' },
-    { title: 'Title', key: 'title', width: '35%' },
-    { title: 'Created At', key: 'createdAt', width: '15%' },
-    { title: 'Actions', key: 'actions', sortable: false, width: '15%' },
+    { title: 'Title', key: 'title', sortable: false },
+    { title: 'Created At', key: 'createdAt', sortable: false },
+    { title: 'Actions', key: 'actions', sortable: false },
   ];
 
   editForm = ref<VForm | null>(null);

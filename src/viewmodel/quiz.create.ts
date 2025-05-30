@@ -197,7 +197,7 @@ export class CreateQuizViewModel {
   };
 
   get disableAddQuestion () : boolean {
-    const questionLimit = 5;
+    const questionLimit = 10;
     return this.quiz.questions.length >= questionLimit;
   }
 

@@ -7,9 +7,8 @@ import { reactive } from 'vue';
 class OptionViewModel {
 
   readonly headers = [
-    { title: 'Option ID', key: 'id', sortable: false, width: '40%' },
-    { title: 'Option Text', key: 'optionText',sortable: false, width: '40%' },
-    { title: 'Correct', key: 'correct', sortable: false, width: '10%' },
+    { title: 'Option Text', key: 'optionText',sortable: false },
+    { title: 'Correct', key: 'correct', sortable: false },
   ];
 
   readonly model = reactive({
