@@ -69,9 +69,9 @@ class SessionResultUserViewModel {
       return answer.answerId === optionId;
     }
 
-    const option = question.options.find(opt => opt.id === optionId)
+    const option = question.options.find(q => q.id === optionId)
 
-    return String(option?.correct) == answer.answerId
+    return option?.correct ?? false;
   };
 
   readonly getUserAnswerText = (questionId: string): string => {

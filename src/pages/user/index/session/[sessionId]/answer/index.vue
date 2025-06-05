@@ -88,11 +88,11 @@
               <v-card-text>
                 <v-radio-group v-model="userAnswerController.model.userAnswers[userAnswerController.currentQuestion.value!.id]" hide-details>
                   <v-radio
-                    v-for="(option, index) in userAnswerController.currentQuestion.value!.options"
+                    v-for="option in userAnswerController.currentQuestion.value!.options"
                     :key="option.id!"
                     color="primary"
                     :label="option.optionText"
-                    :value="(userAnswerController.currentQuestion.value!.type === 'MULTIPLE_CHOICE' || userAnswerController.currentQuestion.value!.customize) ? option.id : index === 0"
+                    :value="option.id"
                   />
                 </v-radio-group>
               </v-card-text>
