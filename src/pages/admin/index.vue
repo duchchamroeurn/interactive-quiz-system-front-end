@@ -28,10 +28,15 @@
         <template #activator="{ props }">
           <v-list v-bind="props">
             <v-list-item
-              prepend-avatar="https://cdn.vuetifyjs.com/images/john.png"
               :subtitle="adminViewModel.user?.email"
               :title="adminViewModel.user?.username"
             >
+              <template #prepend>
+                <v-btn
+                  icon="mdi-account-circle"
+                  variant="text"
+                />
+              </template>
               <template #append>
                 <v-btn
                   icon="mdi-menu-down"

@@ -178,7 +178,7 @@ export class CreateQuizViewModel {
           return { ...questionWithoutOptions, type: questionTypeValue };
         }
         const questionTypeValue = (question.type as QuestionType).type
-        return { ...question, type: questionTypeValue };
+        return { ...question, type: questionTypeValue, correctAnswer: null };
       });
       const newQuiz: QuizRequest = {
         ...this.quiz,
