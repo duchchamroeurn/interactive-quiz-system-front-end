@@ -65,13 +65,7 @@ class SessionResultUserViewModel {
     const question = this.model.sesionResult.quiz.questions.find(q => q.id === questionId);
     if (!question) return false;
 
-    if(question.type == 'MULTIPLE_CHOICE' || question.customize) {
-      return answer.answerId === optionId;
-    }
-
-    const option = question.options.find(q => q.id === optionId)
-
-    return option?.correct ?? false;
+    return answer.answerId === optionId;
   };
 
   readonly getUserAnswerText = (questionId: string): string => {
@@ -83,13 +77,8 @@ class SessionResultUserViewModel {
     const answer = this.model.sesionResult.answers.find(a => a.questionId === questionId);
     if (!answer) return 'Not answered';
 
-    if(question.type == 'MULTIPLE_CHOICE' || question.customize) {
-      const selectedOption = question.options.find(opt => opt.id === answer.answerId);
-      return selectedOption ? selectedOption.optionText : 'Not answered';
-    }
-
-    const answerIndex = (answer.answerId as string).toLowerCase() === 'true' ? 0 : 1
-    return question.options[answerIndex].optionText;
+    const selectedOption = question.options.find(opt => opt.id === answer.answerId);
+    return selectedOption ? selectedOption.optionText : 'Not answered';
   };
 
 }
