@@ -36,6 +36,8 @@ declare module 'vue-router/auto-routes' {
     '/auth/login': RouteRecordInfo<'/auth/login', '/auth/login', Record<never, never>, Record<never, never>>,
     '/user/': RouteRecordInfo<'/user/', '/user', Record<never, never>, Record<never, never>>,
     '/user//': RouteRecordInfo<'/user//', '/user', Record<never, never>, Record<never, never>>,
+    '/user//answer/': RouteRecordInfo<'/user//answer/', '/user/answer', Record<never, never>, Record<never, never>>,
+    '/user//answer/result/[sessionId]': RouteRecordInfo<'/user//answer/result/[sessionId]', '/user/answer/result/:sessionId', { sessionId: ParamValue<true> }, { sessionId: ParamValue<false> }>,
     '/user//session/[sessionId]/answer/': RouteRecordInfo<'/user//session/[sessionId]/answer/', '/user/session/:sessionId/answer', { sessionId: ParamValue<true> }, { sessionId: ParamValue<false> }>,
   }
 }

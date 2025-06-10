@@ -32,7 +32,7 @@
             <v-list-item-title>Profile</v-list-item-title>
           </v-list-item>
           <v-divider />
-          <v-list-item link to="/answer">
+          <v-list-item link to="/user/answer">
             <v-list-item-title>Answers</v-list-item-title>
           </v-list-item>
           <v-divider />
