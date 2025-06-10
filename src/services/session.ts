@@ -15,6 +15,7 @@ interface SessionService {
   endSession: (sessionId: string) => Promise<Session>
   deleteSession: (sessionId: string) => Promise<string>
   getAvailableQuizByUser: (userId: string) => Promise<SuccessPageResponse<SessionWithQuiz>>
+  getSessionByCode: (sessionCode: string) => Promise<Session>
 }
 
 export const sessionService: SessionService = {
@@ -55,8 +56,13 @@ export const sessionService: SessionService = {
     return result.data;
   },
   getAvailableQuizByUser: async (userId: string): Promise<SuccessPageResponse<SessionWithQuiz>> => {
-    const url = 'user/'+ userId +'/quizzes/available';
+    const url = 'user/' + userId + '/quizzes/available';
     const listQuizzes = await apiRequest<SuccessPageResponse<SessionWithQuiz>, z.ZodType<SuccessPageResponse<SessionWithQuiz>>>(url, 'GET', successPageResponseSchema(sessionWithQuizSchema));
     return listQuizzes;
+  },
+  getSessionByCode: async (sessionCode: string): Promise<Session> => {
+    const url = 'session/code/' + sessionCode;
+    const session = await apiRequest<SuccessResponse<Session>, z.ZodType<SuccessResponse<Session>>>(url, 'GET', successResponseSchema(sessionSchema));
+    return session.data;
   },
 }

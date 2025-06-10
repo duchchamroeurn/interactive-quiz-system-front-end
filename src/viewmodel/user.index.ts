@@ -1,4 +1,5 @@
 import { localStorageService } from '@/composables/store';
+import { ResponseError } from '@/models/error';
 import type { SessionWithQuiz } from '@/models/session';
 import router from '@/router';
 import { sessionService } from '@/services/session';
@@ -14,13 +15,19 @@ class HomeUserController {
     return localStorageService.getUser()?.username;
   }
 
-  readonly joinSession = () => {
-    if (this.model.sessionCode.trim()) {
-      console.log(`Joining session with code: ${this.model.sessionCode.trim()}`);
-      // Implement API call to join session
-      // On success, navigate to the quiz session page, passing the session ID
-      // Example: router.push(`/quiz-session/${sessionCode.value.trim()}`);
-      alert(`Attempting to join session: ${this.model.sessionCode.trim()}`);
+  readonly joinSession = async () => {
+    const sessionCode = this.model.sessionCode.trim();
+    if (sessionCode) {
+      try {
+        const sessionResponse = await sessionService.getSessionByCode(sessionCode)
+        this.startQuiz(sessionResponse.sessionId);
+      } catch (error: unknown) {
+        if (error instanceof ResponseError) {
+          console.log(error);
+        }
+      } finally {
+        this.model.sessionCode = ''
+      }
     }
   };
 
