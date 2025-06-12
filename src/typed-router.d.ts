@@ -23,6 +23,7 @@ declare module 'vue-router/auto-routes' {
     '/admin/': RouteRecordInfo<'/admin/', '/admin', Record<never, never>, Record<never, never>>,
     '/admin//': RouteRecordInfo<'/admin//', '/admin', Record<never, never>, Record<never, never>>,
     '/admin//options/': RouteRecordInfo<'/admin//options/', '/admin/options', Record<never, never>, Record<never, never>>,
+    '/admin//profile/': RouteRecordInfo<'/admin//profile/', '/admin/profile', Record<never, never>, Record<never, never>>,
     '/admin//questions/': RouteRecordInfo<'/admin//questions/', '/admin/questions', Record<never, never>, Record<never, never>>,
     '/admin//questions/[id]': RouteRecordInfo<'/admin//questions/[id]', '/admin/questions/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/admin//quizzes/': RouteRecordInfo<'/admin//quizzes/', '/admin/quizzes', Record<never, never>, Record<never, never>>,
@@ -38,6 +39,7 @@ declare module 'vue-router/auto-routes' {
     '/user//': RouteRecordInfo<'/user//', '/user', Record<never, never>, Record<never, never>>,
     '/user//answer/': RouteRecordInfo<'/user//answer/', '/user/answer', Record<never, never>, Record<never, never>>,
     '/user//answer/result/[sessionId]': RouteRecordInfo<'/user//answer/result/[sessionId]', '/user/answer/result/:sessionId', { sessionId: ParamValue<true> }, { sessionId: ParamValue<false> }>,
+    '/user//profile/': RouteRecordInfo<'/user//profile/', '/user/profile', Record<never, never>, Record<never, never>>,
     '/user//session/[sessionId]/answer/': RouteRecordInfo<'/user//session/[sessionId]/answer/', '/user/session/:sessionId/answer', { sessionId: ParamValue<true> }, { sessionId: ParamValue<false> }>,
   }
 }
