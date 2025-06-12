@@ -187,8 +187,7 @@ export class UserAnswerResultViewModel {
    * This function will use Vue Router to go back.
    */
   readonly goBackToAnswers = () => {
-    // Assuming the previous page (list of answers) is at '/profile/answers'
-    router.push('/user/answer');
+    router.back();
   };
 
   // --- Lifecycle Hook ---
