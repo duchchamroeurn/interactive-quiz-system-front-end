@@ -106,27 +106,18 @@ export class UserAnswerController {
     const userId = localStorageService.getUser()?.userId
 
     const result = await answerService.submitAnswers(this.sessionId, userId!, { answers: answersPayload });
-    console.log('Result = ', result)
-
-
-    console.log('Quiz Submitted! Answers:', answersPayload);
-    // console.log('Session ID:', quizSession.value?.sessionId);
-
-    // Here you would typically send `answersPayload` and `quizSession.value?.sessionId`
-    // to your backend API to record the results.
-
+    console.log('Subbmit result = ', timedOut)
     if (!timedOut) {
-      this.model.quizEndMessage = 'Quiz submitted successfully!';
+      console.log('Result = ', result)
+      this.model.quizEndMessage = result
       this.model.quizEndedDialog = true;
     }
-    // Prevent further interaction if quiz is submitted
-    this.model.quizSession = null; // Or disable all inputs
   };
 
   readonly closeQuizEndedDialog = () => {
     this.model.quizEndedDialog = false;
     // Redirect to results page or home, etc.
-    console.log('Quiz ended dialog closed. You might redirect now.');
+    router.back();
   };
 
   readonly onMounted = () => {

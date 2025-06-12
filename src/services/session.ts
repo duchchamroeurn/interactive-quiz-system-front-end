@@ -14,8 +14,8 @@ interface SessionService {
   startSession: (requestBod: CreateSessionRequest) => Promise<Session>
   endSession: (sessionId: string) => Promise<Session>
   deleteSession: (sessionId: string) => Promise<string>
-  getAvailableQuizByUser: (userId: string) => Promise<SuccessPageResponse<SessionWithQuiz>>
-  getSessionByCode: (sessionCode: string) => Promise<Session>
+  getAvailableQuizByUser: (userId: string, type: string | null) => Promise<SuccessPageResponse<SessionWithQuiz>>
+  joinSessionByCode: (sessionCode: string, userId: string) => Promise<Session>
 }
 
 export const sessionService: SessionService = {
@@ -55,14 +55,20 @@ export const sessionService: SessionService = {
     const result = await apiRequest<SuccessResponse<string>, z.ZodType<SuccessResponse<string>>>(url, 'POST', successResponseSchema(z.string()));
     return result.data;
   },
-  getAvailableQuizByUser: async (userId: string): Promise<SuccessPageResponse<SessionWithQuiz>> => {
-    const url = 'user/' + userId + '/quizzes/available';
+  getAvailableQuizByUser: async (userId: string, type: string | null = null): Promise<SuccessPageResponse<SessionWithQuiz>> => {
+    let url = 'user/' + userId + '/quizzes/available';
+    if(type != null) {
+      url += '?type=' + type
+    }
     const listQuizzes = await apiRequest<SuccessPageResponse<SessionWithQuiz>, z.ZodType<SuccessPageResponse<SessionWithQuiz>>>(url, 'GET', successPageResponseSchema(sessionWithQuizSchema));
     return listQuizzes;
   },
-  getSessionByCode: async (sessionCode: string): Promise<Session> => {
-    const url = 'session/code/' + sessionCode;
-    const session = await apiRequest<SuccessResponse<Session>, z.ZodType<SuccessResponse<Session>>>(url, 'GET', successResponseSchema(sessionSchema));
+  joinSessionByCode: async (sessionCode: string, userId: string): Promise<Session> => {
+    const url = 'session/join';
+    const session = await apiRequest<SuccessResponse<Session>, z.ZodType<SuccessResponse<Session>>>(url, 'POST', successResponseSchema(sessionSchema), {
+      sessionCode,
+      userId,
+    });
     return session.data;
   },
 }

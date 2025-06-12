@@ -119,7 +119,7 @@
                 v-else
                 color="success"
                 prepend-icon="mdi-check-all"
-                @click="userAnswerController.submitQuiz"
+                @click="userAnswerController.submitQuiz()"
               >
                 Submit Quiz
               </v-btn>
