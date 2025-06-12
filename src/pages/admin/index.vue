@@ -48,7 +48,7 @@
           </v-list>
         </template>
         <v-list>
-          <v-list-item link to="/profile">
+          <v-list-item link to="/admin/profile">
             <v-list-item-title>Profile</v-list-item-title>
           </v-list-item>
           <v-divider />
